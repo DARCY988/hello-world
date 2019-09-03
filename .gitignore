@@ -1,2 +1,8 @@
-# ignore envirement paths
+# Envirement paths
 /.*/
+
+# Cache file
+__pycache__/
+
+# DataBase file
+*.sqlite3
