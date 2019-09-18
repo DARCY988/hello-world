@@ -1,7 +1,7 @@
 """
 MySQL database manipulation class.
 """
-from fii_ai_api.utility import log
+from fii_ai_api.utils.utility import log
 from DBUtils.PooledDB import PooledDB
 import pymysql
 import datetime

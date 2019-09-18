@@ -31,7 +31,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '8_8q^6$bc2=mwhkud99v@j^7zmf86wcjgfha_w@ovn-+4a5eke'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -116,7 +116,7 @@ STATIC_ROOT = '/opt/media/'
 
 
 # API version control
-__API_VERSION__ = set(['latest'])
+__API_VERSION__ = set(['fii-api/latest'])
 
 # CORS settings
 CORS_ORIGIN_ALLOW_ALL = True
@@ -142,6 +142,23 @@ for app in INSTALLED_APPS:
 
     app_path = os.path.join(BASE_DIR, app)
 
+    # Find each app's confing file, conbine
+    if 'config.py' in os.listdir(app_path):
+        config_file = importlib.import_module('{}.config'.format(app))
+
+        # Get Contributor List
+        if hasattr(config_file, '__CONTRIBUTORS__'):
+            contributors = getattr(config_file, '__CONTRIBUTORS__')
+            for member in contributors:
+                if member not in __CONTRIBUTORS__:
+                    __CONTRIBUTORS__.append(member)
+
+        # Get App Version
+        if hasattr(config_file, '__API_VERSION__'):
+            app_version = getattr(config_file, '__API_VERSION__')
+            for v in app_version:
+                __API_VERSION__ |= set(['{}/{}'.format(app, v)])
+
     # Find cron jobs and append into main `CRONJOBS` to run the scheduled commands
     if 'cron.py' in os.listdir(app_path):
         cron_file = importlib.import_module('{}.cron'.format(app))
@@ -150,17 +167,4 @@ for app in INSTALLED_APPS:
             for cron in cron_jobs:
                 if cron not in CRONJOBS:
                     CRONJOBS.append(cron)
-    print('{} job added.'.format(app))
-
-    # Find each app's confing file, conbine
-    if 'config.py' in os.listdir(app_path):
-        config_file = importlib.import_module('{}.config'.format(app))
-        # Get Contributor List
-        if hasattr(config_file, '__CONTRIBUTORS__'):
-            contributors = getattr(config_file, '__CONTRIBUTORS__')
-            for member in contributors:
-                if member not in __CONTRIBUTORS__:
-                    __CONTRIBUTORS__.append(member)
-
-
-print('Fii IAI project contributors:', ', '.join(__CONTRIBUTORS__))
+                    print('{}.{} job added.'.format(app, cron_jobs))
