@@ -46,7 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # import new dependencies
+    'django_crontab',
     'rest_framework',
+    'django_filters',
+    'corsheaders',
     # project list
     'demo',
 ]
@@ -167,4 +170,3 @@ for app in INSTALLED_APPS:
             for cron in cron_jobs:
                 if cron not in CRONJOBS:
                     CRONJOBS.append(cron)
-                    print('{}.{} job added.'.format(app, cron_jobs))

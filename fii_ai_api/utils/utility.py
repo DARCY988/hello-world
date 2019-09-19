@@ -1,6 +1,8 @@
+import os
 import time
 import pytz
-import datetime
+import inspect
+from datetime import datetime
 import platform
 import logging.handlers
 from functools import wraps
@@ -20,30 +22,62 @@ if platform.system() == 'Linux':
 
 
 def log(msg):
-    """ For user to print msg or save in PROD server. DEBUG use only.
+    """
+    For user to print msg or save in PROD server. DEBUG use only.
+    :param msg:
     :return:
     """
     user_platform = platform.system()
-    if user_platform == 'Windows':
-        return print(msg)
-    elif user_platform == 'Linux':
+    if user_platform == 'Linux':
         print(msg)
         return LOG.info(msg)
+    else:
+        return print(msg)
 
 
-def china_time():
-    """ Return current China time.
-    :return: datetime format
+def fii_cronlog_handler(func):
     """
-    tz = pytz.timezone('Asia/Shanghai')
-    return datetime.datetime.now(tz)
+    For ``Fii IAI Team`` easily implement into your own cron jobs,
+    we create a Decorator to record the execution status and feedback,
+    and save as a summary log (usually save at '/opt/logs/fii_iai.log')
 
-
-def utc_time():
-    """ Return current UTC time.
-    :return: datetime format
+    Example.
+    ```
+        from fii_ai_api.utils.utility import fii_cronlog_handler
+        @fii_cron_handler
+        def my_cron_job_demo():
+            # Do your magic...
+            return 'Hello Fii IAI cron job.'
+    ```
+    NOTE: This handler is only show your function's execution status
+          and feedback (ex. '|YYYY-MM-DD hh:mm:ss|[CRON Sucess]
+          `my_cron_job_demo` (0.001s)').
     """
-    return datetime.datetime.utcnow()
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        app_name = os.path.split(os.path.dirname(inspect.getfile(func)))[-1]
+        try:
+            results = func(*args, **kwargs)
+            cost_time = time.time() - start_time
+            if results is not None:
+                log(
+                    datetime.now().strftime("|%Y/%m/%d %H:%M:%S|")
+                    + '<%s>[CRON Sucess]`%s` (%.3fs)' % (app_name, func.__name__, cost_time)
+                )
+                return results
+            else:
+                log(datetime.now().strftime("|%Y/%m/%d %H:%M:%S|") + '<%s>[CRON Fail]`%s`' % (app_name, func.__name__))
+
+        except Exception as err:
+            log(
+                datetime.now().strftime("|%Y/%m/%d %H:%M:%S|")
+                + '<%s>[CRON Error]`%s`: %s' % (app_name, func.__name__, err)
+            )
+        return results
+
+    return wrapper
 
 
 def timeit(func):

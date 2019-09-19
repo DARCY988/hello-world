@@ -21,7 +21,7 @@ def fii_api_handler(http_method_names=None):
         ```
             @fii_response_handler(['get', 'post', 'put'])
             def AI_algorithm(...):
-                # Do your algorithm...
+                # Do your magic...
                 return results
         ```
 
