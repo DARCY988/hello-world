@@ -5,9 +5,25 @@ __CONTRIBUTORS__ = []
 __API_VERSION__ = ['latest', 'v1.0']
 
 
-mysql_login_info = {
+# -------------------- #
+# DB Information
+# -------------------- #
+# Production Table
+MYSQL_product_table = {
+    'demo': 'demo'
+}
+
+# Testing Table
+MYSQL_test_table = {
+    'demo': 'demo_copy1'
+}
+
+# MySQL login accout and password
+MYSQL_login_info = {
     'username': 'api',
-    'password': 'develop123!@#',
+    'password': 'Develop123!@#',
     'hostname': '192.168.200.237',
     'db_name': 'test',
+    'prod_table': MYSQL_product_table,
+    'test_table': MYSQL_test_table
 }

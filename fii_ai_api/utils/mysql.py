@@ -10,8 +10,8 @@ import numpy as np
 import re
 
 
-class MySQL(object):
-    def __init__(self, username='root', password='Genius', hostname='10.167.219.250', db_name='demo'):
+class BasicMySQL(object):
+    def __init__(self, username='root', password='Genius', hostname='10.167.219.250', db_name='demo', **kwargs):
         # DB Login info
         self.username = username
         self.password = password
@@ -89,9 +89,10 @@ class MySQL(object):
         '''
         db = None
         cursor = None
+        dtype = dtype()
 
         try:
-            # Create multi-thread DB connector
+            # self.db = pymysql.connect(self.hostname, self.username, self.password, self.db_name)
             db = self.pool.connection()
 
             # Set data type
@@ -108,16 +109,16 @@ class MySQL(object):
                 cursor.excute(sql, data_kw)
             else:
                 cursor.execute(sql)
-            if re.match('select|SELECT', sql.lstrip()) is None:
+            if re.match('select|SELECT', sql.lstrip().split(' ')[0]) is not None:
                 return cursor.fetchall()
             else:
                 # select does not need commit(), only update/insert/delete need it
                 db.commit()
 
         except Exception as e:
-            self.log('[{}] meet error'.format(sql))
+            self.log('[{}] meet error'.format(sql.strip()))
             self.log(e)
-            if re.match('select|SELECT', sql.lstrip()) is not None:
+            if re.match('select|SELECT', sql.lstrip().split(' ')[0]) is None:
                 # select does not need rollback
                 db.rollback()
             return ()
@@ -129,3 +130,43 @@ class MySQL(object):
                 db.close()
 
         return True
+
+
+class MySQL(BasicMySQL):
+    def __init__(self, debug=False, db_tables={}, **login_info):
+        self._debug = True if debug == 'test/' else False
+        super().__init__(**login_info)
+
+        # Set mapping table to process.
+        # `db_tables`: directly set the mapping tables(you can customize of your own table).
+        # `debug` flag: Lazy flag to set this SQL class as debug mode or not.
+        if db_tables:
+            self.db_tables = db_tables
+        elif self._debug is True:
+            if 'test_table' not in login_info:
+                raise KeyError(
+                    "Your dictionary lacks key '%s\'. Please provide "
+                    "it, because it is required to determine whether "
+                    "string is singular or plural." % 'test_table'
+                )
+            else:
+                self.db_tables = login_info['test_table']
+        else:
+            if 'prod_table' not in login_info:
+                raise KeyError(
+                    "Your dictionary lacks key '%s\'. Please provide "
+                    "it, because it is required to determine whether "
+                    "string is singular or plural." % 'prod_table'
+                )
+            else:
+                self.db_tables = login_info['prod_table']
+
+    @property
+    def get_db_tables(self):
+        '''Get DataBase working table'''
+        return self.db_tables.copy()
+
+    @property
+    def _if_debug(self):
+        '''Check if the api mode is in debug mode'''
+        return self._debug

@@ -58,7 +58,7 @@ app_name = 'fii_ai_api'
 urlpatterns = [
     re_path('admin/', admin.site.urls),
     re_path(
-        r'(?P<debug>test/)*(?P<api_version>(latest|v\w+\.\w+(\.\w*)*))/',
-        include([re_path(r'demo/', include('demo.urls', namespace='demo-api'))]),
+        r'^(?P<debug>test/)*(?P<api_version>(latest|v\w+\.\w+(\.\w*)*))/',
+        include([re_path(r'^demo/', include('demo.urls', namespace='demo-api'))]),
     ),
 ]
