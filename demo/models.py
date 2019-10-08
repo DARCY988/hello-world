@@ -4,13 +4,8 @@ from .config import MYSQL_login_info
 
 
 class DemoModel(MySQL):
-    def __init__(self, debug=False, db_tables={}, **login_info):
-        _default_login_info = MYSQL_login_info.copy()
-
-        if any(login_info):
-            _default_login_info.update(login_info)
-
-        super().__init__(debug=debug, db_tables=db_tables, **_default_login_info)
+    def __init__(self, debug=False, db_tables={}, custom_login_info={}, **kwargs):
+        super().__init__(debug=debug, db_tables=db_tables, **kwargs)
 
     def test(self, v):
 

@@ -10,20 +10,20 @@ __API_VERSION__ = ['latest', 'v1.0']
 # -------------------- #
 # Production Table
 MYSQL_product_table = {
-    'demo': 'demo'
+    'demo': 'usr_info'
 }
 
 # Testing Table
 MYSQL_test_table = {
-    'demo': 'demo_copy1'
+    'demo': 'usr_info_copy1'
 }
 
 # MySQL login accout and password
 MYSQL_login_info = {
     'username': 'api',
     'password': 'Develop123!@#',
-    'hostname': '192.168.200.237',
-    'db_name': 'test',
+    'hostname': 'localhost',
+    'db_name': 'demo',
     'prod_table': MYSQL_product_table,
     'test_table': MYSQL_test_table
 }

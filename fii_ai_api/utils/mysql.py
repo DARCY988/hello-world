@@ -4,10 +4,14 @@ MySQL database manipulation class.
 from fii_ai_api.utils.utility import log
 from DBUtils.PooledDB import PooledDB
 import pymysql
+import pprint
 import datetime
 import pandas as pd
 import numpy as np
+import inspect
 import re
+import os
+import importlib
 
 
 class BasicMySQL(object):
@@ -133,9 +137,14 @@ class BasicMySQL(object):
 
 
 class MySQL(BasicMySQL):
-    def __init__(self, debug=False, db_tables={}, **login_info):
+    def __init__(self, debug=False, db_tables={}, login_info={}, **kwargs):
         self._debug = True if debug == 'test/' else False
-        super().__init__(**login_info)
+        self.app_path = self._get_caller_app_path
+
+        # initial app config with <app>.config.MYSQL_login_info
+        self.app_config = self._default_config
+
+        super().__init__(**self.app_config, **kwargs)
 
         # Set mapping table to process.
         # `db_tables`: directly set the mapping tables(you can customize of your own table).
@@ -143,23 +152,23 @@ class MySQL(BasicMySQL):
         if db_tables:
             self.db_tables = db_tables
         elif self._debug is True:
-            if 'test_table' not in login_info:
+            if 'test_table' not in self.app_config:
                 raise KeyError(
                     "Your dictionary lacks key '%s\'. Please provide "
                     "it, because it is required to determine whether "
                     "string is singular or plural." % 'test_table'
                 )
             else:
-                self.db_tables = login_info['test_table']
+                self.db_tables = self.app_config['test_table']
         else:
-            if 'prod_table' not in login_info:
+            if 'prod_table' not in self.app_config:
                 raise KeyError(
                     "Your dictionary lacks key '%s\'. Please provide "
                     "it, because it is required to determine whether "
                     "string is singular or plural." % 'prod_table'
                 )
             else:
-                self.db_tables = login_info['prod_table']
+                self.db_tables = self.app_config['prod_table']
 
     @property
     def get_db_tables(self):
@@ -170,3 +179,54 @@ class MySQL(BasicMySQL):
     def _if_debug(self):
         '''Check if the api mode is in debug mode'''
         return self._debug
+
+    @property
+    def get_app_name(self):
+        '''Get which app is calling this function'''
+        app = os.path.split(self.app_path)[-1]
+
+        if 'urls.py' in os.listdir(self.app_path):
+            url_file = importlib.import_module('{}.urls'.format(app))
+            app_name = app
+            if not hasattr(url_file, 'app_name'):
+                raise AttributeError(" File '{}' has no attribute '{}'".format(url_file, 'app_name'))
+            else:
+                app_name = getattr(url_file, 'app_name')
+        return app_name
+
+    @property
+    def _get_caller_app_path(self):
+        stack = inspect.stack()
+
+        # Get caller function object from `stack`
+        for frame in stack:
+            # Get module name
+            module = inspect.getmodule(frame[0])
+            module_name = module.__name__
+            if module_name.endswith(('models', 'views')):
+                break
+
+        return os.path.dirname(module.__file__)
+
+    # BUG: This config initial module have loading problem!!
+    # @property
+    # def _app_config(self):
+    #     return self.__app_config
+
+    # @_app_config.setter
+    # def _app_config(self, custom_config):
+    #     if custom_config:
+    #         self.__app_config.update(custom_config)
+
+    @property
+    def _default_config(self):
+        app = os.path.split(self.app_path)[-1]
+        print('{}.init.app_config'.format(app))
+        if 'config.py' in os.listdir(self.app_path):
+            config_file = importlib.import_module('{}.config'.format(app))
+
+            if not hasattr(config_file, 'MYSQL_login_info'):
+                raise AttributeError(" File '{}' has no attribute '{}'".format(config_file, 'MYSQL_login_info'))
+            else:
+                print('GET default config')
+                return getattr(config_file, 'MYSQL_login_info')
