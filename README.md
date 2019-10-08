@@ -3,7 +3,7 @@
 - pip: 19.1.1
 
 # Download Project
-> git clone http://10.124.131.87:8860/fii-ai-team/api-server.git
+> git clone http://10.124.131.87:8860/fii-iaiia-dept/api-server.git
 
 # Install python requirements
 NOTE: create your own virtual envirement and get into it.
@@ -42,9 +42,13 @@ urlpatterns = [
     re_path('admin/', admin.site.urls),
     re_path(
         r'^(?P<debug>test/)*(?P<api_version>(latest|v\w+\.\w+(\.\w*)*))/',
-        include([re_path(r'^demo/', include('demo.urls', namespace='demo-api'))]),
-        # add your api route here
-        include([re_path(r'^<your app name>/', include('<your app name>.urls', namespace='<your app name>'))]),
+        include(
+            [
+                re_path(r'^demo/', include('demo.urls', namespace='demo-api')),
+                # Add your app path here,
+                re_path(r'^<your app name>/', include('<your app name>.urls', namespace='<your app name>'))
+            ]
+        ),
     ),
 ]
 ```

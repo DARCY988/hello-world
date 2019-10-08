@@ -59,6 +59,12 @@ urlpatterns = [
     re_path('admin/', admin.site.urls),
     re_path(
         r'^(?P<debug>test/)*(?P<api_version>(latest|v\w+\.\w+(\.\w*)*))/',
-        include([re_path(r'^demo/', include('demo.urls', namespace='demo-api'))]),
+        include(
+            [
+                re_path(r'^demo/', include('demo.urls', namespace='demo-api')),
+                # Add your app path here,
+                # Example. re_path(r'^<app name>/', include('<app name>.urls', namespace='<app name>')),
+            ]
+        ),
     ),
 ]
