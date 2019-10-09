@@ -14,6 +14,8 @@ $ source <path to your venv>/Scripts/activate
 # Mac or Linux
 $ source <path to your venv>/bin/activate
 
+# Install Cython
+(venv)$ pip install Cython==0.29.13
 # Install requirements
 (venv)$ pip install -r requirements.txt
 ```
@@ -74,11 +76,13 @@ class model_in_class(...):
         return result
 ```
 
-- (3-2)View: Construct and response your result for front-end engineer. (lazy usage: fii_api_handler)
+- (3-2)View: Construct and response your result for front-end engineer. (lazy usage: @fii_api_handler)
+
 NOTE: For now, front-end only acccpt `dict`, `list`, `pandas.DataFrame` type. We create `fii_api_handler` decorator for you guys to use.
 ```python
 # <your app>/views.py
 from .models import *
+
 @fii_api_handler(['get', 'post'])
 def your_view(request, debug, api_version, # These three are static parameters
               input1, input2, ...): # your input parameters from RESTful api url
