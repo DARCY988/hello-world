@@ -6,7 +6,7 @@
 from fii_ai_api.utils.utility import log, fii_cronlog_handler
 
 CRON_JOBS = [
-    # ('*/1 * * * *', 'demo.cron.my_cron_job_demo', '>> /opt/logs/demo_cron_job.log'),
+    # ('*/1 * * * *', 'demo.cron.my_cron_job_demo', '>> /srv/logs/demo_cron_job.log'),
 ]
 
 
