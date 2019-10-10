@@ -22,7 +22,8 @@ MYSQL_test_table = {
 MYSQL_login_info = {
     'username': 'api',
     'password': 'Develop123!@#',
-    'hostname': 'localhost',
+    'hostname': '10.124.131.87',
+    'port': 3306,
     'db_name': 'demo',
     'prod_table': MYSQL_product_table,
     'test_table': MYSQL_test_table
