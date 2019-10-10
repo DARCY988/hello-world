@@ -131,7 +131,7 @@ CORS_ALLOW_HEADERS = list(default_headers) + ['user-id']
 # Inital Jobs List
 CRONJOBS = [
     # this is just a demo job.
-    # ('*/5 * * * *', 'demo.cron.my_cron_job_demo', '>> /opt/logs/demo_cron_job.log'),
+    # ('*/5 * * * *', 'demo.cron.my_cron_job_demo', '>> /srv/logs/demo_cron_job.log'),
 ]
 
 # Load CORS Jobs
