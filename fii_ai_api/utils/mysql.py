@@ -221,12 +221,11 @@ class MySQL(BasicMySQL):
     @property
     def _default_config(self):
         app = os.path.split(self.app_path)[-1]
-        print('{}.init.app_config'.format(app))
+
         if 'config.py' in os.listdir(self.app_path):
             config_file = importlib.import_module('{}.config'.format(app))
 
             if not hasattr(config_file, 'MYSQL_login_info'):
                 raise AttributeError(" File '{}' has no attribute '{}'".format(config_file, 'MYSQL_login_info'))
             else:
-                print('GET default config')
                 return getattr(config_file, 'MYSQL_login_info')
