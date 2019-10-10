@@ -15,7 +15,8 @@ $ source <path to your venv>/Scripts/activate
 $ source <path to your venv>/bin/activate
 
 # Install Cython
-(venv)$ pip install Cython==0.29.13
+(venv)$ pip install Cython
+
 # Install requirements
 (venv)$ pip install -r requirements.txt
 ```

@@ -5,6 +5,6 @@ from .models import DemoModel
 @fii_api_handler(['get'])
 def demo_response(request, debug, api_version,  # these three parameters always place at index 0:2
                   value):  # Add your parameters here
-    db = DemoModel(debug=debug, test=2)
+    db = DemoModel(debug=debug, api_version=api_version)
 
     return db.test(value)
