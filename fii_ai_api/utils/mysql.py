@@ -15,12 +15,15 @@ import importlib
 
 
 class BasicMySQL(object):
-    def __init__(self, username='root', password='Genius', hostname='10.167.219.250', db_name='demo', **kwargs):
+    def __init__(
+        self, username='root', password='Genius', hostname='10.167.219.250', port='3306', db_name='demo', **kwargs
+    ):
         # DB Login info
         self.username = username
         self.password = password
         self.db_name = db_name
         self.hostname = hostname
+        self.port = int(port)
 
         # Restore BackEnd execution history log
         self.log = log
@@ -39,7 +42,7 @@ class BasicMySQL(object):
             user=self.username,
             passwd=self.password,
             db=self.db_name,
-            port=3306,
+            port=self.port,
         )
 
     def manipulate_db(self, sql, dtype=dict, data_list=None, data_kw={}):

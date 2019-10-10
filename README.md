@@ -3,7 +3,9 @@
 - pip: 19.1.1
 
 # Download Project
-> git clone http://10.124.131.87:8860/fii-iaiia-dept/api-server.git
+```bash
+$ git clone http://10.124.131.87:8860/fii-iaiia-dept/api-server.git
+```
 
 # Install python requirements
 NOTE: create your own virtual envirement and get into it.
@@ -24,7 +26,9 @@ $ source <path to your venv>/bin/activate
 ---
 # 3 Steps to Create API service
 ## (1) Create your own App
-> python manage.py startapp --template=demo <your app name>
+```bash
+$ python manage.py startapp --template=demo <your app name>
+```
 
 ## (2) Install app
 - modify attribute `INSTALLED_APPS` in `fii_ai_api/settings.py`:
