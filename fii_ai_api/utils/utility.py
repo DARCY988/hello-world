@@ -14,7 +14,7 @@ if platform.system() == 'Linux':
     LOG = logging.getLogger(__name__)
     LOG.setLevel(logging.DEBUG)
     rotating_file_handler = logging.handlers.RotatingFileHandler(
-        filename=r'/srv/logs/fii_api_server.log', mode='a', maxBytes=1024 * 1024, backupCount=20
+        filename=r'/opt/logs/fii_api_server.log', mode='a', maxBytes=1024 * 1024, backupCount=20
     )
     formatter = logging.Formatter(fmt='%(asctime)s: %(message)s', datefmt='%a %d %b %Y %H:%M:%S')
     rotating_file_handler.setFormatter(formatter)
