@@ -88,8 +88,14 @@ WSGI_APPLICATION = 'fii_ai_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 DATABASES = {
-    'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': os.path.join(BASE_DIR, 'db.sqlite3')},
-    # 'fii-ai': {'ENGINE': 'django.db.backends.mysql', 'NAME': ''},
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '10.124.131.87',
+        'PORT': 3306,
+        'USER': 'api',
+        'PASSWORD': 'Develop123!@#',
+        'NAME': 'init',
+    }
 }
 
 
