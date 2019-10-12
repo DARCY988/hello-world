@@ -19,5 +19,24 @@ from . import views
 app_name = 'demo'
 
 urlpatterns = [
-    re_path(r'print/(?P<value>\w+)*', views.demo_response),
+    re_path(
+        r'^view/',  # [AT/SD Team]TODO: Add your view api for fornt-end engineer.
+        include(
+            [
+                re_path(r'print/(?P<value>\w+)*', views.demo_ai_view),
+                # Add your api path here,
+                # Example. re_path(r'^<custom url path>/', views.<function>),
+            ]
+        ),
+    ),
+    re_path(
+        r'^api/',  # [DE/SD Team]TODO: Add api for new AT Team members to use.
+        include(
+            [
+                re_path(r'print/(?P<value>\w+)*', views.api_demo_read),
+                # Add your api path here,
+                # Example. re_path(r'^<custom url path>/', views.<function>),
+            ]
+        ),
+    ),
 ]

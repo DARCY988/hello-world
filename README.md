@@ -1,6 +1,6 @@
 # Envirement
-- Python: 3.6.9
-- pip: 19.1.1
+- Python: >=3.6.3
+- pip: >=9.0.1
 
 # Download Project
 ```bash
@@ -64,16 +64,21 @@ urlpatterns = [
 We use `Model - View - Controller(MVC)` Architecture [more info](https://www.tutorialsteacher.com/mvc/mvc-architecture).
 - (3-1)Model: Put your model into `<your app>/models.py` (in demo we use class, but you can use function as well)
 ```python
-# <your app>/models.py
+# <your app>/ai_models.py
+from <your app>.dbio import DemoMySQLIO
+
+# Define your DataBase IO Module
+dbio = DemoMySQLIO(debug=True)
+
 ## function base
-def model_in_function(input1, input2, ...):
+def model_in_function(dbio, input1, input2, ...):
     # do your magic ~~~
     return result
 
 
 ## class base
 class model_in_class(...):
-    def __init__(self, ...):
+    def __init__(self, dbio, ...):
         # initialize your class object
     
     def cls_func1(self, input1, input2, ...):
@@ -86,7 +91,7 @@ class model_in_class(...):
 NOTE: For now, front-end only acccpt `dict`, `list`, `pandas.DataFrame` type. We create `fii_api_handler` decorator for you guys to use.
 ```python
 # <your app>/views.py
-from .models import *
+from .ai_models import *
 
 @fii_api_handler(['get', 'post'])
 def your_view(request, debug, api_version, # These three are static parameters
@@ -118,12 +123,35 @@ app_name = '<your app name>'
 urlpatterns = [
     # this url module supports `Regular Expression` to collect input parameter from RESTful api
     # more info: https://docs.djangoproject.com/en/2.2/topics/http/urls/
-    re_path(r'<make your own root>/(?P<value>\w+)*', views.your_view),
+    re_path(
+        r'^view/',  # [AT/SD Team]TODO: Add your view api for fornt-end engineer.
+        include(
+            [
+                re_path(r'<make your own path>/(?P<value>\w+)*', views.<your_model_view>),
+                # Add your api path here,
+                # Example. re_path(r'^<custom url path>/', views.<function>),
+            ]
+        ),
+    ),
+    re_path(
+        r'^api/',  # [DE/SD Team]TODO: Add api for new AT Team members to use.
+        include(
+            [
+                re_path(r'<make your own path>/(?P<value>\w+)*', views.<your_api_view>),
+                # Add your api path here,
+                # Example. re_path(r'^<custom url path>/', views.<function>),
+            ]
+        ),
+    ),
 ]
 ```
 
 # Run API Server
 ```bash
+# Setup Django, and sync to DB
+(venv)$ python manage.py migrate
+
+# Run API Server
 (venv)$ python manage.py runserver
 Performing system checks...
 

@@ -1,3 +1,3 @@
 #!/bin/bash
 # description: Fii API Service ....
-/usr/bin/uwsgi --ini /opt/api-server/uwsgi.ini
+uwsgi --ini ./uwsgi.ini

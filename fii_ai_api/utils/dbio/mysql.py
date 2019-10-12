@@ -96,18 +96,21 @@ class BasicMySQL(object):
         '''
         db = None
         cursor = None
-        dtype = dtype()
+        if callable(dtype):
+            dtype = dtype()
+        elif isinstance(dtype, str):
+            pass
 
         try:
             # self.db = pymysql.connect(self.hostname, self.username, self.password, self.db_name)
             db = self.pool.connection()
 
             # Set data type
-            if isinstance(dtype, pd.DataFrame):
+            if isinstance(dtype, pd.DataFrame) or dtype == 'DataFrame':
                 return pd.read_sql(sql, con=db)
-            elif isinstance(dtype, dict):
+            elif isinstance(dtype, dict) or dtype == 'dict':
                 cursor = db.cursor(cursor=pymysql.cursors.DictCursor)
-            elif isinstance(dtype, list):
+            elif isinstance(dtype, list) or dtype == 'list':
                 cursor = db.cursor()
 
             if data_list:
