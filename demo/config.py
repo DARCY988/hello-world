@@ -28,3 +28,14 @@ MYSQL_login_info = {
     'prod_table': MYSQL_product_table,
     'test_table': MYSQL_test_table
 }
+
+# !!!!!! ONLY FOR 10/12 tutorial !!!!!!
+# MYSQL_login_info = {
+#     'username': 'sql12308246',
+#     'password': 'kSzgZteUSX',
+#     'hostname': 'sql12.freemysqlhosting.net',
+#     'port': 3306,
+#     'db_name': 'sql12308246',
+#     'prod_table': MYSQL_product_table,
+#     'test_table': MYSQL_test_table
+# }
