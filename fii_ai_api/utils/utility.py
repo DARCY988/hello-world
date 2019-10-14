@@ -6,7 +6,7 @@ from datetime import datetime
 import platform
 import logging.handlers
 from functools import wraps
-
+from fii_ai_api.settings import LOG_ROOT
 from django.utils.deprecation import MiddlewareMixin
 
 
@@ -14,7 +14,7 @@ if platform.system() == 'Linux':
     LOG = logging.getLogger(__name__)
     LOG.setLevel(logging.DEBUG)
     rotating_file_handler = logging.handlers.RotatingFileHandler(
-        filename=r'./.uwsgi/logs/fii_api_server.log', mode='a', maxBytes=1024 * 1024, backupCount=20
+        filename=os.path.join(LOG_ROOT, 'fii_api_server.log'), mode='a', maxBytes=1024 * 1024, backupCount=20
     )
     formatter = logging.Formatter(fmt='%(asctime)s: %(message)s', datefmt='%a %d %b %Y %H:%M:%S')
     rotating_file_handler.setFormatter(formatter)

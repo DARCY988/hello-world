@@ -124,6 +124,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, '/.static/')
 
+# LOG saving path
+LOG_ROOT = os.path.join(BASE_DIR, '/.logs/')
 
 # API version control
 __API_VERSION__ = set(['fii-api/latest'])
