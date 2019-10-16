@@ -10,7 +10,7 @@ $ git clone http://10.124.131.87:8860/fii-iaiia-dept/api-server.git
 # Install python requirements
 NOTE: create your own virtual envirement and get into it.
 ```bash
-# Windows
+# Windows(Git Bash)
 $ source <path to your venv>/Scripts/activate
 
 # Mac or Linux
