@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'corsheaders',
     # project list
     'demo',
+    'ecom',
 ]
 
 MIDDLEWARE = [

@@ -64,6 +64,7 @@ urlpatterns = [
         include(
             [
                 re_path(r'^demo/', include('demo.urls', namespace='demo-api')),
+                re_path(r'^ecom/', include('ecom.urls', namespace='ecom-api')),
                 # Add your app path here,
                 # Example. re_path(r'^<app name>/', include('<app name>.urls', namespace='<app name>')),
             ]
