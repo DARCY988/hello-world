@@ -23,11 +23,22 @@ MYSQL_login_info = {
     'username': 'api',
     'password': 'Develop123!@#',
     'hostname': '10.124.131.87',
-    'port': 3306,
+    'port': 8871,
     'db_name': 'demo',
     'prod_table': MYSQL_product_table,
     'test_table': MYSQL_test_table
 }
+
+# # Local MySQL login accout and password
+# MYSQL_login_info = {
+#     'username': 'api',
+#     'password': 'foxconn168!!',
+#     'hostname': 'localhost',
+#     'port': 3306,
+#     'db_name': 'demo',
+#     'prod_table': MYSQL_product_table,
+#     'test_table': MYSQL_test_table
+# }
 
 # !!!!!! ONLY FOR 10/12 tutorial !!!!!!
 # MYSQL_login_info = {

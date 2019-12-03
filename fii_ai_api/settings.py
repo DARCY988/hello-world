@@ -31,7 +31,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '8_8q^6$bc2=mwhkud99v@j^7zmf86wcjgfha_w@ovn-+4a5eke'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -93,7 +93,7 @@ DATABASES = {
     'fii-ai': {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': '10.124.131.87',
-        'PORT': 3306,
+        'PORT': 8871,
         'USER': 'api',
         'PASSWORD': 'Develop123!@#',
         'NAME': 'init',

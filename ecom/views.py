@@ -25,3 +25,18 @@ def api_demo_read(request, debug, api_version,  # these three parameters always 
     db = DemoMySQLIO(debug=debug, api_version=api_version)
 
     return db.user_info(value)
+
+
+@fii_api_handler(['get'])
+def api_ecn_read(request, debug, api_version):  # Add your parameters here
+    db = DemoMySQLIO(debug=debug, api_version=api_version)
+
+    return db.ecn_info()
+
+
+@fii_api_handler(['get'])
+def api_cert_count(request, debug, api_version,
+                    value):  # Add your parameters here
+    db = DemoMySQLIO(debug=debug, api_version=api_version)
+
+    return db.site_cert_amount(value)
