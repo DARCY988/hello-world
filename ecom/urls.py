@@ -25,6 +25,14 @@ urlpatterns = [
         include(
             [
                 re_path(r'print/(?P<value>\w+)*', views.demo_ai_view),
+                re_path(
+                    r'^ecn',  # Add ECN module here.
+                    include(
+                        [
+                            re_path(r'upload/', ecn_views.upload_view),
+                        ]
+                    )
+                ),
                 # Add your api path here,
                 # Example. re_path(r'^<custom url path>/', views.<function>),
             ]
