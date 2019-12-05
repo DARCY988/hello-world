@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.urls import include, re_path
 from . import views
+from .ecn import ecn_views
 
 app_name = 'ecom'
 
@@ -34,8 +35,15 @@ urlpatterns = [
         include(
             [
                 re_path(r'print/(?P<value>\w+)*', views.api_demo_read),
-                re_path(r'info/', views.api_ecn_read),
-                re_path(r'count/(?P<value>\w+)*', views.api_cert_count),
+                re_path(
+                    r'^ecn',  # Add ECN module here.
+                    include(
+                        [
+                            re_path(r'info/', ecn_views.api_ecn_read),
+                            re_path(r'count/(?P<value>\w+)*', ecn_views.api_cert_count),
+                        ]
+                    )
+                ),
                 # Add your api path here,
                 # Example. re_path(r'^<custom url path>/', views.<function>),
             ]

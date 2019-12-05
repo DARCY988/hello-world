@@ -26,7 +26,7 @@ MYSQL_test_table = {
     'ECN_model': 'ECN_model_copy1',
 }
 
-# MySQL login accout and password
+# # MySQL login accout and password
 # MYSQL_login_info = {
 #     'username': 'api',
 #     'password': 'Develop123!@#',
@@ -37,7 +37,7 @@ MYSQL_test_table = {
 #     'test_table': MYSQL_test_table
 # }
 
-# # Local MySQL login accout and password
+# Local MySQL login accout and password
 MYSQL_login_info = {
     'username': 'api',
     'password': 'foxconn168!!',
@@ -47,7 +47,6 @@ MYSQL_login_info = {
     'prod_table': MYSQL_product_table,
     'test_table': MYSQL_test_table
 }
-
 
 # !!!!!! ONLY FOR 10/12 tutorial !!!!!!
 # MYSQL_login_info = {

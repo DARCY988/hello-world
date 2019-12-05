@@ -148,7 +148,10 @@ class MySQL(BasicMySQL):
         self.app_path = self._get_caller_app_path
 
         # initial app config with <app>.config.MYSQL_login_info
-        self.app_config = self._default_config
+        if login_info:
+            self.app_config = login_info
+        else:
+            self.app_config = self._default_config
 
         super().__init__(**self.app_config, **kwargs)
 
