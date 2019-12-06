@@ -11,7 +11,12 @@ class UploadFileForm(forms.Form):
     def handle_upload_file(self, file, filename):
 
         path = os.path.join(self.path, filename)
-        with open(path, 'wb+') as destination:
-            for chunk in file.chunks():
-                destination.write(chunk)
-            destination.close()
+        try:
+            with open(path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+                destination.close()
+            return 'Upload successfully.'
+
+        except Exception:
+            return Exception

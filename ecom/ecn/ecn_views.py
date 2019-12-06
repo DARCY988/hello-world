@@ -8,18 +8,14 @@ from django.http import HttpResponseRedirect
 # -------------------- #
 @fii_api_handler(['get', 'post'])
 def upload_view(request, debug, api_version):  # Add your parameters here
+
     import os
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            form.handle_upload_file(request.FILES['file'], str(request.FILES.get('file')))
-            # target = os.path.join(form.path, str(request.FILES.get('file')))
-            # with open(target, 'wb+') as destination:
-            #     for chunk in request.FILES['file']:
-            #         destination.write(chunk)
-            #     destination.close()
+            result = form.handle_upload_file(request.FILES['file'], str(request.FILES.get('file')))
 
-    return HttpResponseRedirect('success')
+    return result
 
 
 # -------------------- #
