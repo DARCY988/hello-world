@@ -9,7 +9,6 @@ from django.http import HttpResponseRedirect
 @fii_api_handler(['get', 'post'])
 def upload_view(request, debug, api_version):  # Add your parameters here
 
-    import os
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
