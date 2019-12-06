@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 # -------------------- #
 # AI Model Results API
 # -------------------- #
-@fii_api_handler(['get', 'post'])
+@fii_api_handler(['post'])
 def upload_view(request, debug, api_version):  # Add your parameters here
 
     if request.method == 'POST':
