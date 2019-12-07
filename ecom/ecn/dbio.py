@@ -39,3 +39,25 @@ class ECNMySQLIO(MySQL):
              'pid': pid, 'uploader': uploader, 'create_time': create_time}
         )
         return self.manipulate_db(sql)
+
+    def create_CCL(self, ccl, pn):
+        sql = '''
+        INSERT INTO `%(table)s` (CCL, PN)
+        VALUES ('%(CCL)s', '%(PN)s')
+        ''' % (
+            {'table': self.db_tables['ECN_CCL'], 'CCL': ccl, 'PN': pn}
+        )
+        return self.manipulate_db(sql)
+
+    def check_duplicated(self, table, target, value):
+        sql = '''
+        SELECT EXISTS(SELECT * FROM `%(table)s` WHERE '%(target)s' = '%(value)s') AS count
+        ''' % (
+            {'table': table, 'target': target, 'value': value}
+        )
+        result = self.manipulate_db(sql, dtype='DataFrame').iloc[0][0]
+
+        if result == 0:
+            return False
+        else:
+            return True

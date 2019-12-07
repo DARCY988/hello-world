@@ -24,7 +24,8 @@ class UploadFileForm(forms.Form):
 
     def read_upload_file(self, file, dbio, uploader):
 
-        df = DataFrame(columns=['site', 'category', 'cert_no', 'pid', 'uploader', 'create_time'])
+        df = DataFrame(columns=['site', 'category', 'cert_no', 'pid', 'ccl', 'supplier',
+                                'model', 'spec', 'pn', 'uploader', 'create_time'])
 
         excel_df = read_excel(file, index_col=0, header=0).fillna(method='ffill')
 
@@ -33,11 +34,24 @@ class UploadFileForm(forms.Form):
             category = excel_df.iloc[row][1]
             cert_no = excel_df.iloc[row][2].replace('\'', '')
             pid = excel_df.iloc[row][3].replace('\n', ' ')
+            ccl = excel_df.iloc[row][4]
+            supplier = excel_df.iloc[row][5]
+            model = excel_df.iloc[row][6]
+            spec = excel_df.iloc[row][7]
+            pn = excel_df.iloc[row][8]
             create_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            df = df.append({'site': site, 'category': category, 'cert_no': cert_no,
-                                    'pid': pid, 'uploader': uploader, 'create_time': create_time}, ignore_index=True)
-            if row > 0 and cert_no == excel_df.iloc[row - 1][2].replace('\'', ''):
+            df = df.append({'site': site, 'category': category, 'cert_no': cert_no, 'pid': pid,
+                            'ccl': ccl, 'supplier': supplier, 'model': model, 'spec': spec,
+                            'pn': pn, 'uploader': uploader, 'create_time': create_time}, ignore_index=True)
+
+            # Avoid duplicated cert_no
+            if dbio.check_duplicated('ECN_copy1', 'cert_no', cert_no):
                 continue
             else:
                 dbio.create_ECN(site, category, cert_no, pid, uploader, create_time)
+
+            if dbio.check_duplicated('ECN_CCL_copy1', 'PN', pn):
+                continue
+            else:
+                dbio.create_CCL(ccl, pn)
         return df
