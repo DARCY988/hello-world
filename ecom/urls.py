@@ -29,7 +29,7 @@ urlpatterns = [
                     r'^ecn',  # Add ECN module here.
                     include(
                         [
-                            re_path(r'upload/', ecn_views.upload_view),
+                            re_path(r'upload/', ecn_views.upload_file),
                         ]
                     )
                 ),

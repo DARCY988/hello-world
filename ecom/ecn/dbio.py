@@ -29,3 +29,13 @@ class ECNMySQLIO(MySQL):
             {'target': v, 'ecn': self.db_tables['ECN']}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
+
+    def create_ECN(self, site, category, cert_no, pid, uploader, create_time):
+        sql = '''
+        INSERT INTO `%(table)s` (site, category, cert_no, pid, upload, create_time)
+        VALUES ('%(site)s', '%(category)s', '%(cert_no)s', '%(pid)s', '%(uploader)s', '%(create_time)s')
+        ''' % (
+            {'table': self.db_tables['ECN'], 'site': site, 'category': category, 'cert_no': cert_no,
+             'pid': pid, 'uploader': uploader, 'create_time': create_time}
+        )
+        return self.manipulate_db(sql)

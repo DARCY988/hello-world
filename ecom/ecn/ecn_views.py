@@ -7,12 +7,17 @@ from django.http import HttpResponseRedirect
 # AI Model Results API
 # -------------------- #
 @fii_api_handler(['post'])
-def upload_view(request, debug, api_version):  # Add your parameters here
+def upload_file(request, debug, api_version):  # Add your parameters here
+
+    db = ECNMySQLIO(debug=debug, api_version=api_version)
 
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            result = form.handle_upload_file(request.FILES['file'], str(request.FILES.get('file')))
+            # Save file
+            # result = form.save_upload_file(request.FILES['file'], str(request.FILES.get('file')))
+            # Read file
+            result = form.read_upload_file(request.FILES.get('file'), db, request.POST.get('user'))
 
     return result
 
