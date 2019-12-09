@@ -40,7 +40,7 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql)
 
-    def create_CCL(self, ccl, pn):
+    def create_ccl(self, ccl, pn):
         sql = '''
         INSERT INTO `%(table)s` (CCL, PN)
         VALUES ('%(CCL)s', '%(PN)s')
@@ -49,11 +49,21 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql)
 
-    def check_duplicated(self, table, target, value):
+    def create_model(self, supplier, model, spec, pn, model_comp, pn_comp, cert_no):
         sql = '''
-        SELECT EXISTS(SELECT * FROM `%(table)s` WHERE '%(target)s' = '%(value)s') AS count
+        INSERT INTO `%(table)s` (supplier, model, spec, PN, model_compare, PN_compare, cert_no)
+        VALUES ('%(supplier)s', '%(model)s', '%(spec)s', '%(pn)s', '%(model_comp)s', '%(pn_comp)s', '%(cert_no)s')
         ''' % (
-            {'table': table, 'target': target, 'value': value}
+            {'table': self.db_tables['ECN_model'], 'supplier': supplier, 'model': model, 'spec': spec,
+             'pn': pn, 'model_comp': model_comp, 'pn_comp': pn_comp, 'cert_no': cert_no}
+        )
+        return self.manipulate_db(sql)
+
+    def check_duplicated(self, table, key, value):
+        sql = '''
+        SELECT EXISTS(SELECT * FROM `%(table)s` WHERE '%(key)s' = '%(value)s') AS count
+        ''' % (
+            {'table': table, 'key': key, 'value': value}
         )
         result = self.manipulate_db(sql, dtype='DataFrame').iloc[0][0]
 

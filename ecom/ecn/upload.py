@@ -1,5 +1,5 @@
 from django import forms
-from datetime import datetime
+from datetime import datetime, timezone
 from fii_ai_api.settings import BASE_DIR
 from pandas import DataFrame, read_excel
 
@@ -39,10 +39,13 @@ class UploadFileForm(forms.Form):
             model = excel_df.iloc[row][6]
             spec = excel_df.iloc[row][7]
             pn = excel_df.iloc[row][8]
-            create_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            model_comp = excel_df.iloc[row][9]
+            pn_comp = excel_df.iloc[row][10]
+            create_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
             df = df.append({'site': site, 'category': category, 'cert_no': cert_no, 'pid': pid,
                             'ccl': ccl, 'supplier': supplier, 'model': model, 'spec': spec,
-                            'pn': pn, 'uploader': uploader, 'create_time': create_time}, ignore_index=True)
+                            'pn': pn, 'model_comp': model_comp, 'pn_comp': pn_comp,
+                            'uploader': uploader, 'create_time': create_time}, ignore_index=True)
 
             # Avoid duplicated cert_no
             if dbio.check_duplicated('ECN_copy1', 'cert_no', cert_no):
@@ -53,5 +56,10 @@ class UploadFileForm(forms.Form):
             if dbio.check_duplicated('ECN_CCL_copy1', 'PN', pn):
                 continue
             else:
-                dbio.create_CCL(ccl, pn)
+                dbio.create_ccl(ccl, pn)
+
+            # if dbio.check_duplicated('ECN_CCL_model1', 'model', model):
+            #     continue
+            # else:
+            dbio.create_model(supplier, model, spec, pn, model_comp, pn_comp, cert_no)
         return df
