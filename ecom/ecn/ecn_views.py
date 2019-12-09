@@ -23,17 +23,33 @@ def upload_file(request, debug, api_version):  # Add your parameters here
 
 
 @fii_api_handler(['get'])
-def cert_status_view(request, debug, api_version):
+def category_cert_view(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    data = db.site_cert_amount('category')
+    data = db.cert_amount('category')
 
     # TODO: Check Agile system and get the status
 
     result = {}
     for row in range(0, len(data.index)):
         result['%s' % data.iloc[row]['category']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
+
+    return result
+
+
+@fii_api_handler(['get'])
+def site_cert_view(request, debug, api_version, category):
+
+    db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+    data = db.cert_amount('site', category)
+
+    # TODO: Check Agile system and get the status
+
+    result = []
+    for row in range(0, len(data.index)):
+        result.append({'location': data.iloc[row]['site'], 'value': data.iloc[row]['amount'], 'status': 'Not Ready.'})
 
     return result
 
@@ -54,4 +70,4 @@ def api_cert_count(request, debug, api_version, key):  # Add your parameters her
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    return db.site_cert_amount(key)
+    return db.cert_amount(key)

@@ -21,12 +21,13 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
-    def site_cert_amount(self, key):
+    def cert_amount(self, key, v=None):
         sql = '''
         SELECT `%(key)s`, COUNT(cert_no) as 'amount' FROM `%(ecn)s`
+        %(condition)s
         GROUP BY `%(key)s`
         ''' % (
-            {'key': key, 'ecn': self.db_tables['ECN']}
+            {'key': key, 'ecn': self.db_tables['ECN'], 'condition': 'WHERE category = "%s"' % v if v else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
