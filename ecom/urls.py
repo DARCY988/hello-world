@@ -30,6 +30,7 @@ urlpatterns = [
                     include(
                         [
                             re_path(r'upload/', ecn_views.upload_file),
+                            re_path(r'category/', ecn_views.cert_status_view),
                         ]
                     )
                 ),
