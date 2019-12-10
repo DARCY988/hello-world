@@ -18,7 +18,7 @@ from corsheaders.defaults import default_headers
 
 # System will add contributors from each App in this api project
 # Need to modified this on your own project/config.py
-__CONTRIBUTORS__ = ['Bean Yen', 'Travis Lu', 'Jean Yuan', 'Ivy Kao']
+__CONTRIBUTORS__ = ['Bean Yen', 'Travis Lu', 'Jean Yuan', 'Ivy Kao', 'BonJu Huang']
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'corsheaders',
     # project list
     'demo',
+    'ecom',
 ]
 
 MIDDLEWARE = [
@@ -92,7 +93,7 @@ DATABASES = {
     'fii-ai': {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': '10.124.131.87',
-        'PORT': 3306,
+        'PORT': 8871,
         'USER': 'api',
         'PASSWORD': 'Develop123!@#',
         'NAME': 'init',
