@@ -28,10 +28,10 @@ MYSQL_test_table = {
 
 # MySQL login accout and password
 MYSQL_login_info = {
-    'username': 'api',
-    'password': 'Develop123!@#',
-    'hostname': '10.124.131.87',
-    'port': 8871,
+    'username': 'EUser',
+    'password': 'Efoxconn88',
+    'hostname': '10.124.131.81',
+    'port': 8872,
     'db_name': 'ECompliance',
     'prod_table': MYSQL_product_table,
     'test_table': MYSQL_test_table
@@ -44,17 +44,6 @@ MYSQL_login_info = {
 #     'hostname': 'localhost',
 #     'port': 3306,
 #     'db_name': 'ECompliance',
-#     'prod_table': MYSQL_product_table,
-#     'test_table': MYSQL_test_table
-# }
-
-# !!!!!! ONLY FOR 10/12 tutorial !!!!!!
-# MYSQL_login_info = {
-#     'username': 'sql12308246',
-#     'password': 'kSzgZteUSX',
-#     'hostname': 'sql12.freemysqlhosting.net',
-#     'port': 3306,
-#     'db_name': 'sql12308246',
 #     'prod_table': MYSQL_product_table,
 #     'test_table': MYSQL_test_table
 # }

@@ -16,7 +16,7 @@ class ECNMySQLIO(MySQL):
         FROM `%(ecn)s` as ecn
         INNER JOIN `%(ecn_ccl)s` as ccl
         INNER JOIN `%(ecn_model)s` as model
-        WHERE `%(ecn)s`.cert_no = model.cert_no %(condition)s
+        WHERE ecn.cert_no = model.cert_no %(condition)s
         and model.PN = ccl.PN
         ''' % (
             {'ecn': self.db_tables['ECN'], 'ecn_ccl': self.db_tables['ECN_CCL'],
