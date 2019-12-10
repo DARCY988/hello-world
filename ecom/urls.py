@@ -32,7 +32,9 @@ urlpatterns = [
                             re_path(r'upload/', ecn_views.upload_file),
                             re_path(r'category/', ecn_views.category_cert_view),
                             re_path(r'site/(?P<category>\w+)*', ecn_views.site_cert_view),
-                            re_path(r'ccl/', ecn_views.ccl_cert_view),
+                            re_path(r'ccl/((?P<category>\w+)/(?P<site>\w+))*', ecn_views.ccl_cert_view),
+                            re_path(r'all/((?P<category>\w+)/(?P<site>\w+)/(?P<ccl>[\w\s]+))*',
+                                    ecn_views.all_cert_view),
                         ]
                     )
                 ),

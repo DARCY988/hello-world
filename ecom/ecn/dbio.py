@@ -7,17 +7,22 @@ class ECNMySQLIO(MySQL):
     def __init__(self, debug=False, db_tables={}, custom_login_info={}, **kwargs):
         super().__init__(debug=debug, db_tables=db_tables, login_info=MYSQL_login_info, **kwargs)
 
-    def ecn_info(self):
+    def ecn_info(self, category=None, site=None, ccl=None):
 
         sql = '''
-        SELECT * FROM `%(ecn)s`
+        SELECT ecn.site, ecn.category, ecn.cert_no, ecn.pid, ccl.CCL,
+        model.supplier, model.model, model.spec, model.PN,
+        model.model_compare, model.PN_compare, ecn.upload, ecn.create_time
+        FROM `%(ecn)s` as ecn
         INNER JOIN `%(ecn_ccl)s` as ccl
         INNER JOIN `%(ecn_model)s` as model
-        WHERE `%(ecn)s`.cert_no = model.cert_no
+        WHERE `%(ecn)s`.cert_no = model.cert_no %(condition)s
         and model.PN = ccl.PN
         ''' % (
             {'ecn': self.db_tables['ECN'], 'ecn_ccl': self.db_tables['ECN_CCL'],
-             'ecn_model': self.db_tables['ECN_model']}
+             'ecn_model': self.db_tables['ECN_model'],
+             'condition': 'and ecn.category = "%s" and ecn.site = "%s" and ccl.CCL = "%s"' % (
+                 category, site, ccl) if category else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
@@ -31,7 +36,7 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
-    def ccl_cert_amount(self, one=None, two=None):
+    def ccl_cert_amount(self, category=None, site=None):
         sql = '''
         SELECT c.CCL as 'CCL', COUNT(DISTINCT b.cert_no) as 'amount' FROM `%(ecn)s` as a
         INNER JOIN `%(ecn_model)s` as b
@@ -41,7 +46,7 @@ class ECNMySQLIO(MySQL):
         ''' % (
             {'ecn': self.db_tables['ECN'], 'ecn_model': self.db_tables['ECN_model'],
              'ecn_ccl': self.db_tables['ECN_CCL'],
-             'condition': 'and a.category = "%s" and a.site = "%s"' % (one, two) if one else ''}
+             'condition': 'and a.category = "%s" and a.site = "%s"' % (category, site) if category else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 

@@ -43,29 +43,75 @@ def site_cert_view(request, debug, api_version, category):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
+    location_dict = {
+        "FCZ": [49.9493036, 15.2120232],
+        "FTX": [44.8204983, -94.0602476],
+        "FJZ": [31.6859596, -106.543702],
+        "FOC": [22.7198832, 114.0491412],
+        "FOL": [22.6764474, 113.899891],
+    }
+
     data = db.cert_amount('site', category)
 
     # TODO: Check Agile system and get the status
 
     result = []
     for row in range(0, len(data.index)):
-        result.append({'location': data.iloc[row]['site'], 'value': data.iloc[row]['amount'], 'status': 'Not Ready.'})
+        coord = location_dict['%s' % data.iloc[row]['site']]
+        result.append(
+            {
+                'location': data.iloc[row]['site'],
+                'coord': coord,
+                'value': data.iloc[row]['amount'],
+                'status': 'Not Ready.'
+            }
+        )
 
     return result
 
 
 @fii_api_handler(['get'])
-def ccl_cert_view(request, debug, api_version):
+def ccl_cert_view(request, debug, api_version, category, site):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    data = db.ccl_cert_amount(request.GET['category'], request.GET['site'])
+    data = db.ccl_cert_amount(category, site)
 
     # TODO: Check Agile system and get the status
 
     result = {}
     for row in range(0, len(data.index)):
         result['%s' % data.iloc[row]['CCL']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
+
+    return result
+
+
+@fii_api_handler(['get'])
+def all_cert_view(request, debug, api_version, category, site, ccl):
+
+    db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+    data = db.ecn_info(category, site, ccl)
+
+    # TODO: Check Agile system and get the status
+
+    result = []
+    for row in range(0, len(data.index)):
+        result.append(
+            {
+                'Site': data.iloc[row]['site'],
+                'Category': data.iloc[row]['category'],
+                'Certificate No.': data.iloc[row]['cert_no'],
+                'Product PID': data.iloc[row]['pid'],
+                'CCL': data.iloc[row]['CCL'],
+                'CCL Supplier': data.iloc[row]['supplier'],
+                'CCL Model': data.iloc[row]['model'],
+                'CCL Spec.': data.iloc[row]['spec'],
+                'CCL PN': data.iloc[row]['PN'],
+                'CCL Model compare': data.iloc[row]['model_compare'],
+                'CCL PN compare': data.iloc[row]['PN_compare'],
+            }
+        )
 
     return result
 
