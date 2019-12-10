@@ -23,11 +23,25 @@ class ECNMySQLIO(MySQL):
 
     def cert_amount(self, key, v=None):
         sql = '''
-        SELECT `%(key)s`, COUNT(cert_no) as 'amount' FROM `%(ecn)s`
+        SELECT `%(key)s`, COUNT(DISTINCT cert_no) as 'amount' FROM `%(ecn)s`
         %(condition)s
         GROUP BY `%(key)s`
         ''' % (
             {'key': key, 'ecn': self.db_tables['ECN'], 'condition': 'WHERE category = "%s"' % v if v else ''}
+        )
+        return self.manipulate_db(sql, dtype='DataFrame')
+
+    def ccl_cert_amount(self, one=None, two=None):
+        sql = '''
+        SELECT c.CCL as 'CCL', COUNT(DISTINCT b.cert_no) as 'amount' FROM `%(ecn)s` as a
+        INNER JOIN `%(ecn_model)s` as b
+        INNER JOIN `%(ecn_ccl)s` as c
+        WHERE b.PN = c.PN and b.cert_no = a.cert_no %(condition)s
+        GROUP BY c.CCL
+        ''' % (
+            {'ecn': self.db_tables['ECN'], 'ecn_model': self.db_tables['ECN_model'],
+             'ecn_ccl': self.db_tables['ECN_CCL'],
+             'condition': 'and a.category = "%s" and a.site = "%s"' % (one, two) if one else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 

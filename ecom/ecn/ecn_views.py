@@ -54,6 +54,22 @@ def site_cert_view(request, debug, api_version, category):
     return result
 
 
+@fii_api_handler(['get'])
+def ccl_cert_view(request, debug, api_version):
+
+    db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+    data = db.ccl_cert_amount(request.GET['category'], request.GET['site'])
+
+    # TODO: Check Agile system and get the status
+
+    result = {}
+    for row in range(0, len(data.index)):
+        result['%s' % data.iloc[row]['CCL']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
+
+    return result
+
+
 # -------------------- #
 # DataBase CRUD API
 # -------------------- #
