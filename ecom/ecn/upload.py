@@ -2,6 +2,7 @@ from django import forms
 from datetime import datetime, timezone
 from fii_ai_api.settings import BASE_DIR
 from pandas import DataFrame, read_excel
+import os
 
 
 class UploadFileForm(forms.Form):
@@ -10,7 +11,6 @@ class UploadFileForm(forms.Form):
 
     def save_upload_file(self, file, filename):
 
-        import os
         path = os.path.join(BASE_DIR, 'ecom/ecn/doc')
         try:
             with open(os.path.join(path, filename), 'wb+') as destination:
