@@ -1,7 +1,12 @@
 from fii_ai_api.utils.response import fii_api_handler
 from .dbio import ECNMySQLIO
-from .upload import UploadFileForm
-from django.http import HttpResponseRedirect
+from .fileio import FileFormIO
+from django.http import HttpResponse
+from rest_framework.decorators import api_view
+import os
+
+# Build path in this module like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # -------------------- #
 # AI Model Results API
@@ -9,15 +14,30 @@ from django.http import HttpResponseRedirect
 @fii_api_handler(['post'])
 def upload_file(request, debug, api_version):  # Add your parameters here
 
-    db = ECNMySQLIO(debug=debug, api_version=api_version)
+    # db = ECNMySQLIO(debug=debug, api_version=api_version)
 
+    path = os.path.join(BASE_DIR, 'doc')
     if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
+        fileio = FileFormIO(request.POST, request.FILES)
+        if fileio.is_valid():
             # Save file
-            # result = form.save_upload_file(request.FILES['file'], str(request.FILES.get('file')))
-            # Read file
-            result = form.read_upload_file(request.FILES.get('file'), db, request.POST.get('user'))
+            result = fileio.save_upload_file(request.FILES['file'], path)
+            # Read file and save to db
+            # result = fileio.read_upload_file(request.FILES.get('file'), db, request.POST.get('user'))
+
+    return result
+
+
+@api_view(['get'])
+def download_file(request, debug, api_version, file_name):  # Add your parameters here
+
+    # db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+    path = os.path.join(BASE_DIR, 'doc')
+    if request.method == 'GET':
+        # Do download method.
+        fileio = FileFormIO()
+        result = fileio.download(path, file_name)
 
     return result
 
