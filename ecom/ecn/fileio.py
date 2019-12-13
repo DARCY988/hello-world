@@ -8,7 +8,8 @@ import os
 
 class FileFormIO(forms.Form):
     title = forms.CharField(max_length=100)
-    file = forms.FileField()
+    file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    # file = forms.FileField()
 
     def save_upload_file(self, file, path):
 
@@ -23,7 +24,8 @@ class FileFormIO(forms.Form):
             return 'Upload successfully.'
 
         except Exception:
-            return Exception
+            print(Exception)
+            return 'Upload failed.'
 
     def read_upload_file(self, file, dbio, uploader):
 
