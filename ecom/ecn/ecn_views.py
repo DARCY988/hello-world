@@ -42,6 +42,20 @@ def download_file(request, debug, api_version, file_name):  # Add your parameter
     return result
 
 
+@api_view(['get'])
+def preview_file(request, debug, api_version, file_name):  # Add your parameters here
+
+    # db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+    path = os.path.join(BASE_DIR, 'doc')
+    if request.method == 'GET':
+        # Do download method.
+        fileio = FileFormIO()
+        result = fileio.preview(path, file_name)
+
+    return result
+
+
 @fii_api_handler(['get'])
 def category_cert_view(request, debug, api_version):
 

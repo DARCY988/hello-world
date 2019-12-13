@@ -94,3 +94,35 @@ class FileFormIO(forms.Form):
             result = Response(result)
 
         return result
+
+    def preview(self, path, file_name):
+
+        target = os.path.join(path, file_name)
+        file_type = file_name.split('.')[1]
+        type_dict = {
+            'png': 'image/png',
+            'jpg': 'image/jpg',
+            'jpeg': 'image/jpeg',
+            'pdf': 'application/pdf',
+        }
+        if os.path.exists(target):
+            def file_iterator(chunk_size=512):
+
+                with open(target, 'rb') as file:
+                    while True:
+                        tmp = file.read(chunk_size)
+                        if tmp:
+                            yield tmp
+                        else:
+                            break
+
+            result = StreamingHttpResponse(file_iterator())
+            result['Content-Type'] = type_dict[file_type]
+            result['Content-Disposition'] = 'inline;filename="{0}"'.format(file_name)
+        else:
+            result = {
+                'message': 'File \'%s\' is not found.' % (file_name)
+            }
+            result = Response(result)
+
+        return result
