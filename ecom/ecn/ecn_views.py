@@ -127,19 +127,19 @@ def api_cert_count(request, debug, api_version, key):  # Add your parameters her
 @fii_api_handler(['post'])
 def api_file_upload(request, debug, api_version):  # Add your parameters here
 
-    # db = ECNMySQLIO(debug=debug, api_version=api_version)
+    db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    path = os.path.join(BASE_DIR, 'doc')
-    result = {}
+    # path = os.path.join(BASE_DIR, 'doc')
+    # status = {}
     if request.method == 'POST':
         fileio = FileFormIO(request.POST, request.FILES)
         files = request.FILES.getlist('file_field')
         if fileio.is_valid():
             for f in files:
                 # Save file
-                result['%s' % f.name] = fileio.save_upload_file(f, path)
+                # status['%s' % f.name] = fileio.save_upload_file(f, path)
                 # Read file and save to db
-                # result = fileio.read_upload_file(f, db, request.POST.get('user'))
+                result = fileio.read_upload_file(f, db, request.POST.get('user'))
 
     return result
 

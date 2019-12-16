@@ -88,7 +88,7 @@ class ECNMySQLIO(MySQL):
 
     def check_duplicated(self, table, key, value):
         sql = '''
-        SELECT EXISTS(SELECT * FROM `%(table)s` WHERE '%(key)s' = '%(value)s') AS count
+        SELECT EXISTS(SELECT * FROM `%(table)s` WHERE %(key)s = '%(value)s') AS count
         ''' % (
             {'table': table, 'key': key, 'value': value}
         )

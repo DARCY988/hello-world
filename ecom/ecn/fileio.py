@@ -55,21 +55,16 @@ class FileFormIO(forms.Form):
                             'pn': pn, 'model_comp': model_comp, 'pn_comp': pn_comp,
                             'uploader': uploader, 'create_time': create_time}, ignore_index=True)
 
-            # Avoid duplicated cert_no
-            if dbio.check_duplicated(dbio.db_tables['ECN'], 'cert_no', cert_no):
-                continue
-            else:
+            # Avoid duplicated
+            if not dbio.check_duplicated(dbio.db_tables['ECN'], 'cert_no', cert_no):
                 dbio.create_ECN(site, category, cert_no, pid, uploader, create_time)
 
-            if dbio.check_duplicated(dbio.db_tables['ECN_CCL'], 'PN', pn):
-                continue
-            else:
+            if not dbio.check_duplicated(dbio.db_tables['ECN_CCL'], 'PN', pn):
                 dbio.create_ccl(ccl, pn)
 
-            # if dbio.check_duplicated('ECN_CCL_model1', 'model', model):
-            #     continue
-            # else:
-            dbio.create_model(supplier, model, spec, pn, model_comp, pn_comp, cert_no)
+            if not dbio.check_duplicated(dbio.db_tables['ECN_model'], 'model', model):
+                dbio.create_model(supplier, model, spec, pn, model_comp, pn_comp, cert_no)
+
         return df
 
     def download(self, path, file_name):
