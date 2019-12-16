@@ -11,55 +11,6 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 # -------------------- #
 # AI Model Results API
 # -------------------- #
-@fii_api_handler(['post'])
-def upload_file(request, debug, api_version):  # Add your parameters here
-
-    # db = ECNMySQLIO(debug=debug, api_version=api_version)
-
-    path = os.path.join(BASE_DIR, 'doc')
-    result = {}
-    if request.method == 'POST':
-        fileio = FileFormIO(request.POST, request.FILES)
-        files = request.FILES.getlist('file_field')
-        print(files)
-        if fileio.is_valid():
-            # Save file
-            for f in files:
-                result['%s' % f.name] = fileio.save_upload_file(f, path)
-            # Read file and save to db
-            # result = fileio.read_upload_file(request.FILES.get('file'), db, request.POST.get('user'))
-
-    return result
-
-
-@api_view(['get'])
-def download_file(request, debug, api_version, file_name):  # Add your parameters here
-
-    # db = ECNMySQLIO(debug=debug, api_version=api_version)
-
-    path = os.path.join(BASE_DIR, 'doc')
-    if request.method == 'GET':
-        # Do download method.
-        fileio = FileFormIO()
-        result = fileio.download(path, file_name)
-
-    return result
-
-
-@api_view(['get'])
-def preview_file(request, debug, api_version, file_name):  # Add your parameters here
-
-    # db = ECNMySQLIO(debug=debug, api_version=api_version)
-
-    path = os.path.join(BASE_DIR, 'doc')
-    if request.method == 'GET':
-        # Do download method.
-        fileio = FileFormIO()
-        result = fileio.preview(path, file_name)
-
-    return result
-
-
 @fii_api_handler(['get'])
 def category_cert_view(request, debug, api_version):
 
@@ -171,3 +122,50 @@ def api_cert_count(request, debug, api_version, key):  # Add your parameters her
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
     return db.cert_amount(key)
+
+
+@fii_api_handler(['post'])
+def api_file_upload(request, debug, api_version):  # Add your parameters here
+
+    # db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+    path = os.path.join(BASE_DIR, 'doc')
+    result = {}
+    if request.method == 'POST':
+        fileio = FileFormIO(request.POST, request.FILES)
+        files = request.FILES.getlist('file_field')
+        if fileio.is_valid():
+            # Save file
+            for f in files:
+                result['%s' % f.name] = fileio.save_upload_file(f, path)
+            # Read file and save to db
+            # result = fileio.read_upload_file(request.FILES.get('file'), db, request.POST.get('user'))
+
+    return result
+
+
+@api_view(['get'])
+def api_file_download(request, debug, api_version, file_name):  # Add your parameters here
+
+    path = os.path.join(BASE_DIR, 'doc')
+    if request.method == 'GET':
+        # Do download method.
+        fileio = FileFormIO()
+        result = fileio.download(path, file_name)
+
+    return result
+
+
+@api_view(['get'])
+def api_file_preview(request, debug, api_version, file_name):  # Add your parameters here
+
+    path = os.path.join(BASE_DIR, 'doc')
+    if request.method == 'GET':
+        # Do preview method.
+        fileio = FileFormIO()
+        result = fileio.preview(path, file_name)
+
+    return result
+
+
+
