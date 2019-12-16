@@ -39,6 +39,7 @@ urlpatterns = [
                             re_path(r'upload/', ecn_views.api_file_upload),
                             re_path(r'download/(?P<file_name>.*\..+)', ecn_views.api_file_download),
                             re_path(r'preview/(?P<file_name>.*\..+)', ecn_views.api_file_preview),
+                            re_path(r'delete/(?P<file_name>.*\..+)', ecn_views.api_file_delete),
                         ]
                     )
                 ),

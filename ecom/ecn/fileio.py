@@ -128,3 +128,19 @@ class FileFormIO(forms.Form):
             result = Response(result)
 
         return result
+
+    def delete(self, path, file_name):
+
+        target = os.path.join(path, file_name)
+        if os.path.exists(target):
+            os.remove(target)
+
+            result = {
+                'message': 'File \'%s\' has been deleted.' % (file_name)
+            }
+        else:
+            result = {
+                'message': 'File \'%s\' is not found.' % (file_name)
+            }
+
+        return Response(result)

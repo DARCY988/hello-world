@@ -168,4 +168,13 @@ def api_file_preview(request, debug, api_version, file_name):  # Add your parame
     return result
 
 
+@api_view(['delete'])
+def api_file_delete(request, debug, api_version, file_name):  # Add your parameters here
 
+    path = os.path.join(BASE_DIR, 'doc')
+    if request.method == 'DELETE':
+        # Do delete method.
+        fileio = FileFormIO()
+        result = fileio.delete(path, file_name)
+
+    return result
