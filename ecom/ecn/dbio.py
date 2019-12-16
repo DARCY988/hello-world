@@ -16,37 +16,44 @@ class ECNMySQLIO(MySQL):
         FROM `%(ecn)s` as ecn
         INNER JOIN `%(ecn_ccl)s` as ccl
         INNER JOIN `%(ecn_model)s` as model
-        WHERE ecn.cert_no = model.cert_no %(condition)s
-        and model.PN = ccl.PN
+        WHERE ecn.cert_no = model.cert_no and model.PN = ccl.PN
+        %(category)s
+        %(site)s
+        %(ccl)s
         ''' % (
             {'ecn': self.db_tables['ECN'], 'ecn_ccl': self.db_tables['ECN_CCL'],
              'ecn_model': self.db_tables['ECN_model'],
-             'condition': 'and ecn.category = "%s" and ecn.site = "%s" and ccl.CCL = "%s"' % (
-                 category, site, ccl) if category else ''}
+             'category': 'and ecn.category = "%s"' % category if category else '',
+             'site': 'and ecn.site = "%s"' % site if site else '',
+             'ccl': 'and ccl.CCL = "%s"' % ccl if ccl else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
-    def cert_amount(self, key, v=None):
+    def cert_amount(self, key, category=None):
         sql = '''
         SELECT `%(key)s`, COUNT(DISTINCT cert_no) as 'amount' FROM `%(ecn)s`
-        %(condition)s
+        %(category)s
         GROUP BY `%(key)s`
         ''' % (
-            {'key': key, 'ecn': self.db_tables['ECN'], 'condition': 'WHERE category = "%s"' % v if v else ''}
+            {'key': key, 'ecn': self.db_tables['ECN'],
+             'category': 'WHERE category = "%s"' % category if category else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
     def ccl_cert_amount(self, category=None, site=None):
         sql = '''
-        SELECT c.CCL as 'CCL', COUNT(DISTINCT b.cert_no) as 'amount' FROM `%(ecn)s` as a
-        INNER JOIN `%(ecn_model)s` as b
-        INNER JOIN `%(ecn_ccl)s` as c
-        WHERE b.PN = c.PN and b.cert_no = a.cert_no %(condition)s
-        GROUP BY c.CCL
+        SELECT ccl.CCL as 'CCL', COUNT(DISTINCT model.cert_no) as 'amount' FROM `%(ecn)s` as ecn
+        INNER JOIN `%(ecn_model)s` as model
+        INNER JOIN `%(ecn_ccl)s` as ccl
+        WHERE model.PN = ccl.PN and model.cert_no = ecn.cert_no
+        %(category)s
+        %(site)s
+        GROUP BY ccl.CCL
         ''' % (
             {'ecn': self.db_tables['ECN'], 'ecn_model': self.db_tables['ECN_model'],
              'ecn_ccl': self.db_tables['ECN_CCL'],
-             'condition': 'and a.category = "%s" and a.site = "%s"' % (category, site) if category else ''}
+             'category': 'and ecn.category = "%s"' % category if category else '',
+             'site': 'and ecn.site = "%s"' % site if site else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 

@@ -8,8 +8,8 @@ import os
 
 class FileFormIO(forms.Form):
     title = forms.CharField(max_length=100)
-    file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
-    # file = forms.FileField()
+    file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))  # Multi-files
+    # file = forms.FileField()  # Only one file
 
     def save_upload_file(self, file, path):
 
@@ -40,7 +40,7 @@ class FileFormIO(forms.Form):
         for row in range(0, len(excel_df.index)):
             site = excel_df.iloc[row][0]
             category = excel_df.iloc[row][1]
-            cert_no = excel_df.iloc[row][2].replace('\'', '')
+            cert_no = excel_df.iloc[row][2].replace('\'', '').strip()
             pid = excel_df.iloc[row][3].replace('\n', ' ')
             ccl = excel_df.iloc[row][4]
             supplier = excel_df.iloc[row][5]
