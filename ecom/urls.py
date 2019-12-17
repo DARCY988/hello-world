@@ -13,12 +13,9 @@ urlpatterns = [
                     r'^ecn',  # Add ECN module here.
                     include(
                         [
-                            re_path(r'upload/', ecn_views.upload_file),
-                            re_path(r'category/', ecn_views.category_cert_view),
+                            re_path(r'category/(?P<site>\w+)*', ecn_views.category_cert_view),
                             re_path(r'site/(?P<category>\w+)*', ecn_views.site_cert_view),
-                            re_path(r'ccl/((?P<category>\w+)/(?P<site>\w+))*', ecn_views.ccl_cert_view),
-                            re_path(r'all/((?P<category>\w+)/(?P<site>\w+)/(?P<ccl>[\w\s]+))*',
-                                    ecn_views.all_cert_view),
+                            re_path(r'all/(?P<category>\w+)*/*(?P<site>\w+)*', ecn_views.all_cert_view),
                         ]
                     )
                 ),
@@ -37,6 +34,10 @@ urlpatterns = [
                         [
                             re_path(r'info/', ecn_views.api_ecn_read),
                             re_path(r'count/(?P<key>\w+)*', ecn_views.api_cert_count),
+                            re_path(r'upload/', ecn_views.api_file_upload),
+                            re_path(r'download/(?P<file_name>.*\..+)', ecn_views.api_file_download),
+                            re_path(r'preview/(?P<file_name>.*\..+)', ecn_views.api_file_preview),
+                            re_path(r'delete/(?P<file_name>.*\..+)', ecn_views.api_file_delete),
                         ]
                     )
                 ),

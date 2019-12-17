@@ -2,7 +2,7 @@
 __CONTRIBUTORS__ = ['BonJu']
 
 # API version
-__API_VERSION__ = ['latest', 'v1.0']
+__API_VERSION__ = ['latest', 'v1.1']
 
 
 # -------------------- #
@@ -10,10 +10,6 @@ __API_VERSION__ = ['latest', 'v1.0']
 # -------------------- #
 # Production Table
 MYSQL_product_table = {
-    'DataCenter': 'DataCenter',
-    'DC_cert_upload': 'DC_cert_upload',
-    'DC_index_upload': 'DC_index_upload',
-    'DC_report_upload': 'DC_report_upload',
     'ECN': 'ECN',
     'ECN_CCL': 'ECN_CCL',
     'ECN_model': 'ECN_model',

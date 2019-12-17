@@ -1,39 +1,28 @@
 from fii_ai_api.utils.response import fii_api_handler
 from .dbio import ECNMySQLIO
-from .upload import UploadFileForm
-from django.http import HttpResponseRedirect
+from .fileio import FileFormIO
+from django.http import HttpResponse
+from rest_framework.decorators import api_view
+import os
+
+# Build path in this module like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # -------------------- #
 # AI Model Results API
 # -------------------- #
-@fii_api_handler(['post'])
-def upload_file(request, debug, api_version):  # Add your parameters here
-
-    db = ECNMySQLIO(debug=debug, api_version=api_version)
-
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Save file
-            # result = form.save_upload_file(request.FILES['file'], str(request.FILES.get('file')))
-            # Read file
-            result = form.read_upload_file(request.FILES.get('file'), db, request.POST.get('user'))
-
-    return result
-
-
 @fii_api_handler(['get'])
-def category_cert_view(request, debug, api_version):
+def category_cert_view(request, debug, api_version, site=None):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    data = db.cert_amount('category')
+    data = db.cert_amount('category', 'site' if site else None, site)
 
     # TODO: Check Agile system and get the status
 
     result = {}
     for row in range(0, len(data.index)):
-        result['%s' % data.iloc[row]['category']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
+        result[data.iloc[row]['category']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
 
     return result
 
@@ -51,47 +40,57 @@ def site_cert_view(request, debug, api_version, category):
         "FOL": [22.6764474, 113.899891],
     }
 
-    data = db.cert_amount('site', category)
+    data = db.cert_amount('site', 'category' if category else None, category)
 
     # TODO: Check Agile system and get the status
 
     result = []
     for row in range(0, len(data.index)):
-        coord = location_dict['%s' % data.iloc[row]['site']]
-        result.append(
-            {
-                'location': data.iloc[row]['site'],
-                'coord': coord,
-                'value': data.iloc[row]['amount'],
-                'status': 'Not Ready.'
-            }
-        )
+        site = data.iloc[row]['site']
+        if site in location_dict:
+            result.append(
+                {
+                    'location': data.iloc[row]['site'],
+                    'coord': location_dict[site],
+                    'value': data.iloc[row]['amount'],
+                    'status': 'Not Ready.'
+                }
+            )
+        else:
+            result.append(
+                {
+                    'location': data.iloc[row]['site'],
+                    'coord': 'No coordination data.',
+                    'value': data.iloc[row]['amount'],
+                    'status': 'Not Ready.'
+                }
+            )
 
     return result
 
 
+# @fii_api_handler(['get'])
+# def ccl_cert_view(request, debug, api_version, category, site):
+
+#     db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+#     data = db.ccl_cert_amount(category, site)
+
+#     # TODO: Check Agile system and get the status
+
+#     result = {}
+#     for row in range(0, len(data.index)):
+#         result[data.iloc[row]['CCL']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
+
+#     return result
+
+
 @fii_api_handler(['get'])
-def ccl_cert_view(request, debug, api_version, category, site):
+def all_cert_view(request, debug, api_version, category, site):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    data = db.ccl_cert_amount(category, site)
-
-    # TODO: Check Agile system and get the status
-
-    result = {}
-    for row in range(0, len(data.index)):
-        result['%s' % data.iloc[row]['CCL']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
-
-    return result
-
-
-@fii_api_handler(['get'])
-def all_cert_view(request, debug, api_version, category, site, ccl):
-
-    db = ECNMySQLIO(debug=debug, api_version=api_version)
-
-    data = db.ecn_info(category, site, ccl)
+    data = db.ecn_info(category, site)
 
     # TODO: Check Agile system and get the status
 
@@ -133,3 +132,59 @@ def api_cert_count(request, debug, api_version, key):  # Add your parameters her
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
     return db.cert_amount(key)
+
+
+@fii_api_handler(['post'])
+def api_file_upload(request, debug, api_version):  # Add your parameters here
+
+    db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+    # path = os.path.join(BASE_DIR, 'doc')
+    # status = {}
+    if request.method == 'POST':
+        fileio = FileFormIO(request.POST, request.FILES)
+        files = request.FILES.getlist('file_field')
+        if fileio.is_valid():
+            for f in files:
+                # Save file
+                # status['%s' % f.name] = fileio.save_upload_file(f, path)
+                # Read file and save to db
+                result = fileio.read_upload_file(f, db, request.POST.get('user'))
+
+    return result
+
+
+@api_view(['get'])
+def api_file_download(request, debug, api_version, file_name):  # Add your parameters here
+
+    path = os.path.join(BASE_DIR, 'doc')
+    if request.method == 'GET':
+        # Do download method.
+        fileio = FileFormIO()
+        result = fileio.download(path, file_name)
+
+    return result
+
+
+@api_view(['get'])
+def api_file_preview(request, debug, api_version, file_name):  # Add your parameters here
+
+    path = os.path.join(BASE_DIR, 'doc')
+    if request.method == 'GET':
+        # Do preview method.
+        fileio = FileFormIO()
+        result = fileio.preview(path, file_name)
+
+    return result
+
+
+@api_view(['delete'])
+def api_file_delete(request, debug, api_version, file_name):  # Add your parameters here
+
+    path = os.path.join(BASE_DIR, 'doc')
+    if request.method == 'DELETE':
+        # Do delete method.
+        fileio = FileFormIO()
+        result = fileio.delete(path, file_name)
+
+    return result
