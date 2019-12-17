@@ -10,10 +10,6 @@ __API_VERSION__ = ['latest', 'v1.1']
 # -------------------- #
 # Production Table
 MYSQL_product_table = {
-    'DataCenter': 'DataCenter',
-    'DC_cert_upload': 'DC_cert_upload',
-    'DC_index_upload': 'DC_index_upload',
-    'DC_report_upload': 'DC_report_upload',
     'ECN': 'ECN',
     'ECN_CCL': 'ECN_CCL',
     'ECN_model': 'ECN_model',
@@ -26,24 +22,24 @@ MYSQL_test_table = {
     'ECN_model': 'ECN_model_copy1',
 }
 
-# # MySQL login accout and password
-# MYSQL_login_info = {
-#     'username': 'EUser',
-#     'password': 'Efoxconn88',
-#     'hostname': '10.124.131.81',
-#     'port': 8872,
-#     'db_name': 'ECompliance',
-#     'prod_table': MYSQL_product_table,
-#     'test_table': MYSQL_test_table
-# }
-
-# Local MySQL login accout and password
+# MySQL login accout and password
 MYSQL_login_info = {
-    'username': 'api',
-    'password': 'foxconn168!!',
-    'hostname': 'localhost',
-    'port': 3306,
+    'username': 'EUser',
+    'password': 'Efoxconn88',
+    'hostname': '10.124.131.81',
+    'port': 8872,
     'db_name': 'ECompliance',
     'prod_table': MYSQL_product_table,
     'test_table': MYSQL_test_table
 }
+
+# # Local MySQL login accout and password
+# MYSQL_login_info = {
+#     'username': 'api',
+#     'password': 'foxconn168!!',
+#     'hostname': 'localhost',
+#     'port': 3306,
+#     'db_name': 'ECompliance',
+#     'prod_table': MYSQL_product_table,
+#     'test_table': MYSQL_test_table
+# }
