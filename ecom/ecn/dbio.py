@@ -29,33 +29,33 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
-    def cert_amount(self, key, category=None):
+    def cert_amount(self, target, key=None, condition=None):
         sql = '''
-        SELECT `%(key)s`, COUNT(DISTINCT cert_no) as 'amount' FROM `%(ecn)s`
-        %(category)s
-        GROUP BY `%(key)s`
+        SELECT `%(target)s`, COUNT(DISTINCT cert_no) as 'amount' FROM `%(ecn)s`
+        %(condition)s
+        GROUP BY `%(target)s`
         ''' % (
-            {'key': key, 'ecn': self.db_tables['ECN'],
-             'category': 'WHERE category = "%s"' % category if category else ''}
+            {'target': target, 'ecn': self.db_tables['ECN'],
+             'condition': 'WHERE %s = "%s"' % (key, condition) if (key and condition) else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
-    def ccl_cert_amount(self, category=None, site=None):
-        sql = '''
-        SELECT ccl.CCL as 'CCL', COUNT(DISTINCT model.cert_no) as 'amount' FROM `%(ecn)s` as ecn
-        INNER JOIN `%(ecn_model)s` as model
-        INNER JOIN `%(ecn_ccl)s` as ccl
-        WHERE model.PN = ccl.PN and model.cert_no = ecn.cert_no
-        %(category)s
-        %(site)s
-        GROUP BY ccl.CCL
-        ''' % (
-            {'ecn': self.db_tables['ECN'], 'ecn_model': self.db_tables['ECN_model'],
-             'ecn_ccl': self.db_tables['ECN_CCL'],
-             'category': 'and ecn.category = "%s"' % category if category else '',
-             'site': 'and ecn.site = "%s"' % site if site else ''}
-        )
-        return self.manipulate_db(sql, dtype='DataFrame')
+    # def ccl_cert_amount(self, category=None, site=None):
+    #     sql = '''
+    #     SELECT ccl.CCL as 'CCL', COUNT(DISTINCT model.cert_no) as 'amount' FROM `%(ecn)s` as ecn
+    #     INNER JOIN `%(ecn_model)s` as model
+    #     INNER JOIN `%(ecn_ccl)s` as ccl
+    #     WHERE model.PN = ccl.PN and model.cert_no = ecn.cert_no
+    #     %(category)s
+    #     %(site)s
+    #     GROUP BY ccl.CCL
+    #     ''' % (
+    #         {'ecn': self.db_tables['ECN'], 'ecn_model': self.db_tables['ECN_model'],
+    #          'ecn_ccl': self.db_tables['ECN_CCL'],
+    #          'category': 'and ecn.category = "%s"' % category if category else '',
+    #          'site': 'and ecn.site = "%s"' % site if site else ''}
+    #     )
+    #     return self.manipulate_db(sql, dtype='DataFrame')
 
     def create_ECN(self, site, category, cert_no, pid, uploader, create_time):
         sql = '''

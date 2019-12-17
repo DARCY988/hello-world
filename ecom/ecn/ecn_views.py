@@ -12,17 +12,17 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 # AI Model Results API
 # -------------------- #
 @fii_api_handler(['get'])
-def category_cert_view(request, debug, api_version):
+def category_cert_view(request, debug, api_version, site=None):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    data = db.cert_amount('category')
+    data = db.cert_amount('category', 'site' if site else None, site)
 
     # TODO: Check Agile system and get the status
 
     result = {}
     for row in range(0, len(data.index)):
-        result['%s' % data.iloc[row]['category']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
+        result[data.iloc[row]['category']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
 
     return result
 
@@ -40,47 +40,57 @@ def site_cert_view(request, debug, api_version, category):
         "FOL": [22.6764474, 113.899891],
     }
 
-    data = db.cert_amount('site', category)
+    data = db.cert_amount('site', 'category' if category else None, category)
 
     # TODO: Check Agile system and get the status
 
     result = []
     for row in range(0, len(data.index)):
-        coord = location_dict['%s' % data.iloc[row]['site']]
-        result.append(
-            {
-                'location': data.iloc[row]['site'],
-                'coord': coord,
-                'value': data.iloc[row]['amount'],
-                'status': 'Not Ready.'
-            }
-        )
+        site = data.iloc[row]['site']
+        if site in location_dict:
+            result.append(
+                {
+                    'location': data.iloc[row]['site'],
+                    'coord': location_dict[site],
+                    'value': data.iloc[row]['amount'],
+                    'status': 'Not Ready.'
+                }
+            )
+        else:
+            result.append(
+                {
+                    'location': data.iloc[row]['site'],
+                    'coord': 'No coordination data.',
+                    'value': data.iloc[row]['amount'],
+                    'status': 'Not Ready.'
+                }
+            )
 
     return result
 
 
+# @fii_api_handler(['get'])
+# def ccl_cert_view(request, debug, api_version, category, site):
+
+#     db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+#     data = db.ccl_cert_amount(category, site)
+
+#     # TODO: Check Agile system and get the status
+
+#     result = {}
+#     for row in range(0, len(data.index)):
+#         result[data.iloc[row]['CCL']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
+
+#     return result
+
+
 @fii_api_handler(['get'])
-def ccl_cert_view(request, debug, api_version, category, site):
+def all_cert_view(request, debug, api_version, category, site):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    data = db.ccl_cert_amount(category, site)
-
-    # TODO: Check Agile system and get the status
-
-    result = {}
-    for row in range(0, len(data.index)):
-        result['%s' % data.iloc[row]['CCL']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
-
-    return result
-
-
-@fii_api_handler(['get'])
-def all_cert_view(request, debug, api_version, category, site, ccl):
-
-    db = ECNMySQLIO(debug=debug, api_version=api_version)
-
-    data = db.ecn_info(category, site, ccl)
+    data = db.ecn_info(category, site)
 
     # TODO: Check Agile system and get the status
 
