@@ -1,7 +1,7 @@
 from fii_ai_api.utils.response import fii_api_handler
 from .dbio import ECNMySQLIO
 from .fileio import FileFormIO
-from django.http import HttpResponse
+from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import os
 
@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 # -------------------- #
 # AI Model Results API
 # -------------------- #
-@fii_api_handler(['get'])
+@api_view(['get'])
 def category_cert_view(request, debug, api_version, site=None):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
@@ -24,10 +24,10 @@ def category_cert_view(request, debug, api_version, site=None):
     for row in range(0, len(data.index)):
         result[data.iloc[row]['category']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
 
-    return result
+    return Response(result)
 
 
-@fii_api_handler(['get'])
+@api_view(['get'])
 def site_cert_view(request, debug, api_version, category):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
@@ -66,10 +66,10 @@ def site_cert_view(request, debug, api_version, category):
                 }
             )
 
-    return result
+    return Response(result)
 
 
-# @fii_api_handler(['get'])
+# @api_view(['get'])
 # def ccl_cert_view(request, debug, api_version, category, site):
 
 #     db = ECNMySQLIO(debug=debug, api_version=api_version)
@@ -82,10 +82,10 @@ def site_cert_view(request, debug, api_version, category):
 #     for row in range(0, len(data.index)):
 #         result[data.iloc[row]['CCL']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
 
-#     return result
+#     return Response(result)
 
 
-@fii_api_handler(['get'])
+@api_view(['get'])
 def all_cert_view(request, debug, api_version, category, site):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
@@ -112,7 +112,7 @@ def all_cert_view(request, debug, api_version, category, site):
             }
         )
 
-    return result
+    return Response(result)
 
 
 # -------------------- #
@@ -134,7 +134,7 @@ def api_cert_count(request, debug, api_version, key):  # Add your parameters her
     return db.cert_amount(key)
 
 
-@fii_api_handler(['post'])
+@api_view(['post'])
 def api_file_upload(request, debug, api_version):  # Add your parameters here
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)

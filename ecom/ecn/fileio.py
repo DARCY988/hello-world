@@ -33,7 +33,7 @@ class FileFormIO(forms.Form):
                                 'model', 'spec', 'pn', 'uploader', 'create_time'])
 
         # Read excel file
-        pre_df = read_excel(file, index_col=0, header=0)
+        pre_df = read_excel(file, sheet_name=0, index_col=0, header=0)
         excel_df = pre_df.fillna(method='ffill')
         pre_df.fillna('', inplace=True)
 
@@ -65,7 +65,7 @@ class FileFormIO(forms.Form):
             if not dbio.check_duplicated(dbio.db_tables['ECN_model'], 'model', model):
                 dbio.create_model(supplier, model, spec, pn, model_comp, pn_comp, cert_no)
 
-        return df
+        return Response(df)
 
     def download(self, path, file_name):
 
@@ -86,7 +86,7 @@ class FileFormIO(forms.Form):
             result['Content-Disposition'] = 'attachment;filename="{0}"'.format(file_name)
         else:
             result = {
-                'message': 'File \'%s\' is not found.' % (file_name)
+                'message': 'File \'%s\' not found.' % (file_name)
             }
             result = Response(result)
 
@@ -118,7 +118,7 @@ class FileFormIO(forms.Form):
             result['Content-Disposition'] = 'inline;filename="{0}"'.format(file_name)
         else:
             result = {
-                'message': 'File \'%s\' is not found.' % (file_name)
+                'message': 'File \'%s\' not found.' % (file_name)
             }
             result = Response(result)
 
@@ -135,7 +135,7 @@ class FileFormIO(forms.Form):
             }
         else:
             result = {
-                'message': 'File \'%s\' is not found.' % (file_name)
+                'message': 'File \'%s\' not found.' % (file_name)
             }
 
         return Response(result)
