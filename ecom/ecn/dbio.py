@@ -29,14 +29,14 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
-    def cert_amount(self, target, key=None, condition=None):
+    def cert_amount(self, target, key=None, value=None):
         sql = '''
         SELECT `%(target)s`, COUNT(DISTINCT cert_no) as 'amount' FROM `%(ecn)s`
         %(condition)s
         GROUP BY `%(target)s`
         ''' % (
             {'target': target, 'ecn': self.db_tables['ECN'],
-             'condition': 'WHERE %s = "%s"' % (key, condition) if (key and condition) else ''}
+             'condition': 'WHERE %s = "%s"' % (key, value) if (key and value) else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
