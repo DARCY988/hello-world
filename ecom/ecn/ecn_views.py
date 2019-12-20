@@ -69,26 +69,13 @@ def site_cert_view(request, debug, api_version, category):
     return Response(result)
 
 
-# @api_view(['get'])
-# def ccl_cert_view(request, debug, api_version, category, site):
-
-#     db = ECNMySQLIO(debug=debug, api_version=api_version)
-
-#     data = db.ccl_cert_amount(category, site)
-
-#     # TODO: Check Agile system and get the status
-
-#     result = {}
-#     for row in range(0, len(data.index)):
-#         result[data.iloc[row]['CCL']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
-
-#     return Response(result)
-
-
 @api_view(['get'])
-def all_cert_view(request, debug, api_version, category, site):
+def all_cert_view(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+    category = request.GET.get('category', None)
+    site = request.GET.get('site', None)
 
     data = db.ecn_info(category, site)
 

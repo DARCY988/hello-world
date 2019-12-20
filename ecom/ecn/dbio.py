@@ -7,7 +7,7 @@ class ECNMySQLIO(MySQL):
     def __init__(self, debug=False, db_tables={}, custom_login_info={}, **kwargs):
         super().__init__(debug=debug, db_tables=db_tables, login_info=MYSQL_login_info, **kwargs)
 
-    def ecn_info(self, category=None, site=None, ccl=None):
+    def ecn_info(self, category=None, site=None):
 
         sql = '''
         SELECT ecn.site, ecn.category, ecn.cert_no, ecn.pid, ccl.CCL,
@@ -19,13 +19,12 @@ class ECNMySQLIO(MySQL):
         WHERE ecn.cert_no = model.cert_no and model.PN = ccl.PN
         %(category)s
         %(site)s
-        %(ccl)s
         ''' % (
-            {'ecn': self.db_tables['ECN'], 'ecn_ccl': self.db_tables['ECN_CCL'],
+            {'ecn': self.db_tables['ECN'],
+             'ecn_ccl': self.db_tables['ECN_CCL'],
              'ecn_model': self.db_tables['ECN_model'],
              'category': 'and ecn.category = "%s"' % category if category else '',
-             'site': 'and ecn.site = "%s"' % site if site else '',
-             'ccl': 'and ccl.CCL = "%s"' % ccl if ccl else ''}
+             'site': 'and ecn.site = "%s"' % site if site else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
