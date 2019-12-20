@@ -1,3 +1,13 @@
+""" Uploaded file handling class.
+Variables:
+---
+NOTE:
+    All variables are named by the parameters in front-web `BODY`.
+    Example.
+    ```
+        file_field: A parameter named "file_field" in front-web `BODY`.
+    ```
+"""
 from django import forms
 from django.http import StreamingHttpResponse
 from rest_framework.response import Response
@@ -5,31 +15,60 @@ import os
 
 
 class FileHandler(forms.Form):
-    title = forms.CharField(max_length=100)
     file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))  # Multi-files
     # file = forms.FileField()  # Only one file
 
     def save(self, file, path):
+        ''' Save file.
+        Parameters
+        ---
+        file: UploadedFile
+            Your uploaded file.
 
+        path: str
+            Set the file location you want to save.
+
+        Return
+        ---
+        result: str
+            File saving status.
+        '''
         if not os.path.exists(path):
             os.mkdir(path)
 
-        result = {}
         try:
             with open(os.path.join(path, file.name), 'wb+') as destination:
                 for chunk in file.chunks():
                     destination.write(chunk)
-                destination.close()
-                result['message'] = 'Upload successfully.'
+                result = 'Upload successfully.'
 
         except Exception as e:
             print(e)
-            result['message'] = 'Upload failed.'
+            result = 'Upload failed.'
+
+        finally:
+            destination.close()
 
         return result
 
     def download(self, path, file_name):
+        ''' Download file.
+        Parameters
+        ---
+        path: str
+            Set the file location.
 
+        file_name: str
+            Set the file name.
+
+        Return
+        ---
+        CASE I: `result`: StreamingHttpResponse
+            File streaming response.
+
+        CASE II: `result`: Response
+            File not found message response.
+        '''
         target = os.path.join(path, file_name)
         if os.path.exists(target):
             def file_iterator(chunk_size=512):
@@ -54,7 +93,23 @@ class FileHandler(forms.Form):
         return result
 
     def preview(self, path, file_name):
+        ''' Preview file.
+        Parameters
+        ---
+        path: str
+            Set the file location.
 
+        file_name: str
+            Set the file name.
+
+        Return
+        ---
+        CASE I: `result`: StreamingHttpResponse
+            File streaming response.
+
+        CASE II: `result`: Response
+            File not found message response.
+        '''
         target = os.path.join(path, file_name)
         file_type = file_name.split('.')[-1]
         type_dict = {
@@ -86,7 +141,20 @@ class FileHandler(forms.Form):
         return result
 
     def delete(self, path, file_name):
+        ''' Delete file.
+        Parameters
+        ---
+        path: str
+            Set the file location.
 
+        file_name: str
+            Set the file name.
+
+        Return
+        ---
+        result: Response
+            Delete message response.
+        '''
         target = os.path.join(path, file_name)
         if os.path.exists(target):
             os.remove(target)

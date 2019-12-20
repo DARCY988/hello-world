@@ -147,7 +147,9 @@ def api_file_upload(request, debug, api_version):  # Add your parameters here
         if fileio.is_valid():
             for f in files:
                 # Save file
-                # status[f.name] = fileio.save(f, path)
+                # status[f.name] = {
+                #     'status': fileio.save(f, path)
+                # }
                 # Read file and save to db
                 result = fileio.read(f, db, request.POST.get('user'))
 

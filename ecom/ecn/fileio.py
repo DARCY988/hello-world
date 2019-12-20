@@ -1,4 +1,4 @@
-from fii_ai_api.utils.fileio.files import FileHandler
+from fii_ai_api.utils.fileio.handler import FileHandler
 from datetime import datetime, timezone, timedelta
 from pandas import DataFrame, read_excel
 
@@ -39,7 +39,7 @@ class FileFormIO(FileHandler):
                     'pn': pn,
                     'model_comp': model_comp,
                     'pn_comp': pn_comp,
-                    'uploader': uploader,
+                    'upload': uploader,
                     'create_time': create_time,
                 }
             )
