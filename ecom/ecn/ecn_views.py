@@ -130,7 +130,7 @@ def api_file_upload(request, debug, api_version):  # Add your parameters here
     # status = {}
     if request.method == 'POST':
         fileio = FileFormIO(request.POST, request.FILES)
-        files = request.FILES.getlist('file_field')  # Parameter name must be tha same as the front-form
+        files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
         if fileio.is_valid():
             for f in files:
                 # Save file

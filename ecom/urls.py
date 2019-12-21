@@ -10,7 +10,7 @@ urlpatterns = [
         include(
             [
                 re_path(
-                    r'^ecn',  # Add ECN module here.
+                    r'^ecn/',  # Add ECN module here.
                     include(
                         [
                             re_path(r'category/(?P<site>\w+)*', ecn_views.category_cert_view),
@@ -29,7 +29,7 @@ urlpatterns = [
         include(
             [
                 re_path(
-                    r'^ecn',  # Add ECN module here.
+                    r'^ecn/',  # Add ECN module here.
                     include(
                         [
                             re_path(r'info/', ecn_views.api_ecn_read),

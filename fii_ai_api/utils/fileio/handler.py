@@ -73,13 +73,21 @@ class FileHandler(forms.Form):
         if os.path.exists(target):
             def file_iterator(chunk_size=512):
 
-                with open(target, 'rb') as file:
-                    while True:
-                        tmp = file.read(chunk_size)
-                        if tmp:
-                            yield tmp
-                        else:
-                            break
+                try:
+                    with open(target, 'rb') as file:
+                        while True:
+                            tmp = file.read(chunk_size)
+                            if tmp:
+                                yield tmp
+                            else:
+                                break
+
+                except Exception as e:
+                    print(e)
+                    return e
+
+                finally:
+                    file.close()
 
             result = StreamingHttpResponse(file_iterator())
             result['Content-Type'] = 'application/octet-stream'
@@ -121,13 +129,21 @@ class FileHandler(forms.Form):
         if os.path.exists(target):
             def file_iterator(chunk_size=512):
 
-                with open(target, 'rb') as file:
-                    while True:
-                        tmp = file.read(chunk_size)
-                        if tmp:
-                            yield tmp
-                        else:
-                            break
+                try:
+                    with open(target, 'rb') as file:
+                        while True:
+                            tmp = file.read(chunk_size)
+                            if tmp:
+                                yield tmp
+                            else:
+                                break
+
+                except Exception as e:
+                    print(e)
+                    return e
+
+                finally:
+                    file.close()
 
             result = StreamingHttpResponse(file_iterator())
             result['Content-Type'] = type_dict[file_type]
