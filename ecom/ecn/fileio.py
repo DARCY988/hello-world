@@ -1,42 +1,17 @@
-from django import forms
+from fii_ai_api.utils.files import FileHandler
 from datetime import datetime, timezone, timedelta
 from pandas import DataFrame, read_excel
-from django.http import StreamingHttpResponse
-from rest_framework.response import Response
-import os
 
 
-class FileFormIO(forms.Form):
-    title = forms.CharField(max_length=100)
-    file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))  # Multi-files
-    # file = forms.FileField()  # Only one file
-
-    def save_upload_file(self, file, path):
-
-        if not os.path.exists(path):
-            os.mkdir(path)
-
-        try:
-            with open(os.path.join(path, file.name), 'wb+') as destination:
-                for chunk in file.chunks():
-                    destination.write(chunk)
-                destination.close()
-            return 'Upload successfully.'
-
-        except Exception:
-            print(Exception)
-            return 'Upload failed.'
-
-    def read_upload_file(self, file, dbio, uploader):
-
-        df = DataFrame(columns=['site', 'category', 'cert_no', 'pid', 'ccl', 'supplier',
-                                'model', 'spec', 'pn', 'uploader', 'create_time'])
+class FileFormIO(FileHandler):
+    def read(self, file, dbio, uploader):
 
         # Read excel file
         pre_df = read_excel(file, sheet_name=0, index_col=0, header=0)
         excel_df = pre_df.fillna(method='ffill')
         pre_df.fillna('', inplace=True)
 
+        result = []
         for row in range(0, len(excel_df.index)):
             site = excel_df.iloc[row][0]
             category = excel_df.iloc[row][1]
@@ -50,10 +25,24 @@ class FileFormIO(forms.Form):
             model_comp = pre_df.iloc[row][9]
             pn_comp = pre_df.iloc[row][10]
             create_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-            df = df.append({'site': site, 'category': category, 'cert_no': cert_no, 'pid': pid,
-                            'ccl': ccl, 'supplier': supplier, 'model': model, 'spec': spec,
-                            'pn': pn, 'model_comp': model_comp, 'pn_comp': pn_comp,
-                            'uploader': uploader, 'create_time': create_time}, ignore_index=True)
+
+            result.append(
+                {
+                    'site': site,
+                    'category': category,
+                    'cert_no': cert_no,
+                    'pid': pid,
+                    'ccl': ccl,
+                    'supplier': supplier,
+                    'model': model,
+                    'spec': spec,
+                    'pn': pn,
+                    'model_comp': model_comp,
+                    'pn_comp': pn_comp,
+                    'upload': uploader,
+                    'create_time': create_time,
+                }
+            )
 
             # Avoid duplicated
             if not dbio.check_duplicated(dbio.db_tables['ECN'], 'cert_no', cert_no):
@@ -65,77 +54,4 @@ class FileFormIO(forms.Form):
             if not dbio.check_duplicated(dbio.db_tables['ECN_model'], 'model', model):
                 dbio.create_model(supplier, model, spec, pn, model_comp, pn_comp, cert_no)
 
-        return Response(df)
-
-    def download(self, path, file_name):
-
-        target = os.path.join(path, file_name)
-        if os.path.exists(target):
-            def file_iterator(chunk_size=512):
-
-                with open(target, 'rb') as file:
-                    while True:
-                        tmp = file.read(chunk_size)
-                        if tmp:
-                            yield tmp
-                        else:
-                            break
-
-            result = StreamingHttpResponse(file_iterator())
-            result['Content-Type'] = 'application/octet-stream'
-            result['Content-Disposition'] = 'attachment;filename="{0}"'.format(file_name)
-        else:
-            result = {
-                'message': 'File \'%s\' not found.' % (file_name)
-            }
-            result = Response(result)
-
         return result
-
-    def preview(self, path, file_name):
-
-        target = os.path.join(path, file_name)
-        file_type = file_name.split('.')[1]
-        type_dict = {
-            'png': 'image/png',
-            'jpg': 'image/jpg',
-            'jpeg': 'image/jpeg',
-            'pdf': 'application/pdf',
-        }
-        if os.path.exists(target):
-            def file_iterator(chunk_size=512):
-
-                with open(target, 'rb') as file:
-                    while True:
-                        tmp = file.read(chunk_size)
-                        if tmp:
-                            yield tmp
-                        else:
-                            break
-
-            result = StreamingHttpResponse(file_iterator())
-            result['Content-Type'] = type_dict[file_type]
-            result['Content-Disposition'] = 'inline;filename="{0}"'.format(file_name)
-        else:
-            result = {
-                'message': 'File \'%s\' not found.' % (file_name)
-            }
-            result = Response(result)
-
-        return result
-
-    def delete(self, path, file_name):
-
-        target = os.path.join(path, file_name)
-        if os.path.exists(target):
-            os.remove(target)
-
-            result = {
-                'message': 'File \'%s\' has been deleted.' % (file_name)
-            }
-        else:
-            result = {
-                'message': 'File \'%s\' not found.' % (file_name)
-            }
-
-        return Response(result)
