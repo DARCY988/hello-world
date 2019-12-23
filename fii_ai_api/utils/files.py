@@ -66,7 +66,7 @@ class FileHandler(forms.Form):
         CASE I: `result`: StreamingHttpResponse
             File streaming response.
 
-        CASE II: `result`: Response
+        CASE II: `error`: Response
             File not found message response.
         '''
         target = os.path.join(path, file_name)
@@ -92,13 +92,15 @@ class FileHandler(forms.Form):
             result = StreamingHttpResponse(file_iterator())
             result['Content-Type'] = 'application/octet-stream'
             result['Content-Disposition'] = 'attachment;filename="{0}"'.format(file_name)
+
+            return result
         else:
-            result = {
+            error = {
                 'message': 'File \'%s\' not found.' % (file_name)
             }
-            result = Response(result)
+            error = Response(error)
 
-        return result
+            return error
 
     def preview(self, path, file_name):
         ''' Preview file.
@@ -115,7 +117,7 @@ class FileHandler(forms.Form):
         CASE I: `result`: StreamingHttpResponse
             File streaming response.
 
-        CASE II: `result`: Response
+        CASE II: `error`: Response
             File not found message response.
         '''
         target = os.path.join(path, file_name)
@@ -148,13 +150,15 @@ class FileHandler(forms.Form):
             result = StreamingHttpResponse(file_iterator())
             result['Content-Type'] = type_dict[file_type]
             result['Content-Disposition'] = 'inline;filename="{0}"'.format(file_name)
+
+            return result
         else:
-            result = {
+            error = {
                 'message': 'File \'%s\' not found.' % (file_name)
             }
-            result = Response(result)
+            error = Response(error)
 
-        return result
+            return error
 
     def delete(self, path, file_name):
         ''' Delete file.
