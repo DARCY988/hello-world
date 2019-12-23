@@ -33,6 +33,7 @@ class ECNMySQLIO(MySQL):
         SELECT `%(target)s`, COUNT(DISTINCT cert_no) as 'amount' FROM `%(ecn)s`
         %(condition)s
         GROUP BY `%(target)s`
+        ORDER BY amount DESC
         ''' % (
             {'target': target, 'ecn': self.db_tables['ECN'],
              'condition': 'WHERE %s = "%s"' % (key, value) if (key and value) else ''}

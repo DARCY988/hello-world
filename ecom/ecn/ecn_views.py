@@ -16,13 +16,33 @@ def category_cert_view(request, debug, api_version, site=None):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
+    categories = [
+        'CCC',
+        'CSA',
+        'ETL',
+        'IECEx',
+        'MET',
+        'Nemko',
+        'TUV',
+        'UL',
+    ]
+
     data = db.cert_amount('category', 'site' if site else None, site)
 
     # TODO: Check Agile system and get the status
 
     result = {}
     for row in range(0, len(data.index)):
-        result[data.iloc[row]['category']] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
+        category = data.iloc[row]['category']
+
+        result[category] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
+
+        # Remove none-zero category from list
+        if category in categories:
+            categories.remove(category)
+
+    for empty in categories:
+        result[empty] = {'value': 0, 'status': 'Not Ready.'}
 
     return Response(result)
 
@@ -32,12 +52,12 @@ def site_cert_view(request, debug, api_version, category):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    location_dict = {
-        "FCZ": [49.9493036, 15.2120232],
-        "FTX": [44.8204983, -94.0602476],
-        "FJZ": [31.6859596, -106.543702],
-        "FOC": [22.7198832, 114.0491412],
-        "FOL": [22.6764474, 113.899891],
+    locations = {
+        "FCZ": [15.2120232, 49.9493036],
+        "FOC": [115.0491412, 27.7198832],
+        "FOL": [113.899891, 18.6764474],
+        "FTX": [-94.0602476, 44.8204983],
+        "FJZ": [-106.543702, 31.6859596],
     }
 
     data = db.cert_amount('site', 'category' if category else None, category)
@@ -47,24 +67,29 @@ def site_cert_view(request, debug, api_version, category):
     result = []
     for row in range(0, len(data.index)):
         site = data.iloc[row]['site']
-        if site in location_dict:
-            result.append(
-                {
-                    'location': data.iloc[row]['site'],
-                    'coord': location_dict[site],
-                    'value': data.iloc[row]['amount'],
-                    'status': 'Not Ready.'
-                }
-            )
-        else:
-            result.append(
-                {
-                    'location': data.iloc[row]['site'],
-                    'coord': 'No coordination data.',
-                    'value': data.iloc[row]['amount'],
-                    'status': 'Not Ready.'
-                }
-            )
+
+        result.append(
+            {
+                'name': data.iloc[row]['site'],
+                'coord': locations[site],
+                'value': data.iloc[row]['amount'],
+                'status': 'Not Ready.'
+            }
+        )
+
+        # Remove none-zero site from dictionary
+        if site in locations:
+            del locations[site]
+
+    for empty in locations:
+        result.append(
+            {
+                'name': empty,
+                'coord': locations[empty],
+                'value': 0,
+                'status': 'Not Ready.'
+            }
+        )
 
     return Response(result)
 
