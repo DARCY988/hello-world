@@ -4,7 +4,7 @@ from pandas import DataFrame, read_excel
 
 
 class FileFormIO(FileHandler):
-    def read(self, file, dbio, uploader):
+    def read_ecn(self, file, dbio, uploader):
 
         # Read excel file
         pre_df = read_excel(file, sheet_name=0, index_col=0, header=0)

@@ -1,6 +1,6 @@
 from django.db import models
 from fii_ai_api.utils.dbio.mysql import MySQL
-from ecom.config import MYSQL_login_info
+from ecom.config import MYSQL_login_info, AGILE_login_info
 
 
 class ECNMySQLIO(MySQL):
@@ -8,7 +8,6 @@ class ECNMySQLIO(MySQL):
         super().__init__(debug=debug, db_tables=db_tables, login_info=MYSQL_login_info, **kwargs)
 
     def ecn_info(self, category=None, site=None):
-
         sql = '''
         SELECT ecn.site, ecn.category, ecn.cert_no, ecn.pid, ccl.CCL,
         model.supplier, model.model, model.spec, model.PN,
@@ -98,3 +97,21 @@ class ECNMySQLIO(MySQL):
             return False
         else:
             return True
+
+
+class AgileMySQLIO(MySQL):
+    def __init__(self, debug=False, db_tables={}, custom_login_info={}, **kwargs):
+        super().__init__(debug=debug, db_tables=db_tables, login_info=AGILE_login_info, **kwargs)
+
+    def agile_info(self, site=None):
+        sql = '''
+        SELECT ecn.no, ecn.pn, detail.manufacturer, detail.model FROM `%(ecn_table)s` as ecn
+        INNER JOIN `%(pn_table)s` as detail
+        WHERE ecn.pn = detail.pn
+        %(site)s
+        ''' % (
+            {'ecn_table': self.db_tables['ECN'], 'pn_table': self.db_tables['PN'],
+             'site': site if site else ''}
+        )
+
+        return self.manipulate_db(sql, dtype='DataFrame')

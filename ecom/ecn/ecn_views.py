@@ -1,6 +1,7 @@
 from fii_ai_api.utils.response import fii_api_handler
-from .dbio import ECNMySQLIO
+from .dbio import ECNMySQLIO, AgileMySQLIO
 from .fileio import FileFormIO
+from .models import count_by_category, count_by_site, list_all_cert, list_all_ecn
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import os
@@ -11,38 +12,13 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 # -------------------- #
 # AI Model Results API
 # -------------------- #
+# ECN Tab
 @api_view(['get'])
 def category_cert_view(request, debug, api_version, site=None):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    categories = [
-        'CCC',
-        'CSA',
-        'ETL',
-        'IECEx',
-        'MET',
-        'Nemko',
-        'TUV',
-        'UL',
-    ]
-
-    data = db.cert_amount('category', 'site' if site else None, site)
-
-    # TODO: Check Agile system and get the status
-
-    result = {}
-    for row in range(0, len(data.index)):
-        category = data.iloc[row]['category']
-
-        result[category] = {'value': data.iloc[row]['amount'], 'status': 'Not Ready.'}
-
-        # Remove none-zero category from list
-        if category in categories:
-            categories.remove(category)
-
-    for empty in categories:
-        result[empty] = {'value': 0, 'status': 'Not Ready.'}
+    result = count_by_category(db, site)
 
     return Response(result)
 
@@ -52,44 +28,7 @@ def site_cert_view(request, debug, api_version, category):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    locations = {
-        "FCZ": [15.2120232, 49.9493036],
-        "FOC": [115.0491412, 27.7198832],
-        "FOL": [113.899891, 18.6764474],
-        "FTX": [-94.0602476, 44.8204983],
-        "FJZ": [-106.543702, 31.6859596],
-    }
-
-    data = db.cert_amount('site', 'category' if category else None, category)
-
-    # TODO: Check Agile system and get the status
-
-    result = []
-    for row in range(0, len(data.index)):
-        site = data.iloc[row]['site']
-
-        result.append(
-            {
-                'name': data.iloc[row]['site'],
-                'coord': locations[site],
-                'value': data.iloc[row]['amount'],
-                'status': 'Not Ready.'
-            }
-        )
-
-        # Remove none-zero site from dictionary
-        if site in locations:
-            del locations[site]
-
-    for empty in locations:
-        result.append(
-            {
-                'name': empty,
-                'coord': locations[empty],
-                'value': 0,
-                'status': 'Not Ready.'
-            }
-        )
+    result = count_by_site(db, category)
 
     return Response(result)
 
@@ -102,27 +41,18 @@ def all_cert_view(request, debug, api_version):
     category = request.GET.get('category', None)
     site = request.GET.get('site', None)
 
-    data = db.ecn_info(category, site)
+    result = list_all_cert(db, category, site)
 
-    # TODO: Check Agile system and get the status
+    return Response(result)
 
-    result = []
-    for row in range(0, len(data.index)):
-        result.append(
-            {
-                'Site': data.iloc[row]['site'],
-                'Category': data.iloc[row]['category'],
-                'Certificate No.': data.iloc[row]['cert_no'],
-                'Product PID': data.iloc[row]['pid'],
-                'CCL': data.iloc[row]['CCL'],
-                'CCL Supplier': data.iloc[row]['supplier'],
-                'CCL Model': data.iloc[row]['model'],
-                'CCL Spec.': data.iloc[row]['spec'],
-                'CCL PN': data.iloc[row]['PN'],
-                'CCL Model compare': data.iloc[row]['model_compare'],
-                'CCL PN compare': data.iloc[row]['PN_compare'],
-            }
-        )
+
+# Agile Tab
+@api_view(['get'])
+def all_ecn_view(request, debug, api_version, site=None):
+    agile_db = AgileMySQLIO(debug=debug, api_version=api_version)
+    ecn_db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+    result = list_all_ecn(agile_db, ecn_db, site)
 
     return Response(result)
 
@@ -163,7 +93,7 @@ def api_file_upload(request, debug, api_version):  # Add your parameters here
                 #     'status': fileio.save(f, path)
                 # }
                 # Read file and save to db
-                result = fileio.read(f, db, request.POST.get('user'))
+                result = fileio.read_ecn(f, db, request.POST.get('user'))
 
     return Response(result)
 
