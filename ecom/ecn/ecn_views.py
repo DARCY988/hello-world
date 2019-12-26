@@ -21,14 +21,6 @@ def category_cert_view(request, debug, api_version, site=None):
 
     result = models.count_by_category(db, site)
 
-    mail_service = MailCenter(debug=debug, api_version=api_version)
-
-    models.alarm(
-        mail_service=mail_service,
-        subject='ECN Error!',
-        text_content='Find ECN different.'
-    )
-
     return Response(result)
 
 
@@ -51,6 +43,15 @@ def all_cert_view(request, debug, api_version):
     site = request.GET.get('site', None)
 
     result = models.list_all_cert(db, category, site)
+
+    # Alarm process
+    mail_service = MailCenter(debug=debug, api_version=api_version)
+
+    models.alarm(
+        mail_service=mail_service,
+        subject='ECN Error!',
+        text_content='Find ECN different.'
+    )
 
     return Response(result)
 

@@ -2,7 +2,7 @@
 __CONTRIBUTORS__ = ['BonJu']
 
 # API version
-__API_VERSION__ = ['latest', 'v1.3']
+__API_VERSION__ = ['latest', 'v2.0']
 
 
 # -------------------- #
