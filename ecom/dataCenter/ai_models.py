@@ -4,31 +4,34 @@ import datetime
 db = DataCenterMySQLIO(debug=True)
 
 
-def checking_expire(**kwargs):  # EX: column = site OR category
+def checking_expire(**kwargs):  # EX: category = ccc or site = FOC
 
-    time_now = datetime.datetime.now()
+    time_now = datetime.datetime.now()   # 取得現在時間
     result = []
-
-    exp_time = db.get_all_column()
-
-    for i in exp_time:
-        diff_day = i[6] - time_now
-        if diff_day.days >= 120:
+    data = db.get_all_data(**kwargs)     # 取得數據庫所有資料
+    for row in data:                     # 取出每一筆證書
+        diff_day = row['exp_date'] - time_now  # 到期時間減去現在時間
+        if diff_day.days >= 120:               # >120天為正常 狀態0
             status = 0
-        elif diff_day.days < 120:
+        elif diff_day.days < 120:              # <120 要預警 呈現橘色 狀態1
             status = 1
-        elif diff_day.days < 30:
+        elif diff_day.days < 30:               # <30 每天預警 呈現紅色 狀態2
             status = 2
-        result.append({'site' : i[0],
-                       'category' : i[1],
-                       'certificate' : i[2],
-                       'pid': i[3],
-                       'applicant' : i[5],
-                       'issue_date' : i[4],
-                       'exp_date' : i[6],
+
+        # 將取出的資料與日期比對結果寫入result
+        # status取出是bytes, 要轉ord
+        result.append({'site' : row['site'],
+                       'category' : row['category'],
+                       'certificate' : row['cert_no'],
+                       'pid': row['pid'],
+                       'applicant' : row['applicant'],
+                       'issue_date' : row['issue_date'],
+                       'exp_date' : row['exp_date'],
+                       'status' : ord(row['status']),
+                       'upload' : row['upload'],
+                       'Date' : row['Date'],
                        'exp_date_status' : status
                        })
-#  sorted(result, key=itemgetter(6))
     return result
 
 

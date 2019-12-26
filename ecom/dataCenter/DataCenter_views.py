@@ -36,9 +36,11 @@ def api_checking_status_by_site(request, debug, api_version  # these three param
 def api_get_all_data(request, debug, api_version  # these three parameters always place at index 0:2
                      ):  # Add your parameters here
 
-    value = request.POST.get('select_category')
-    result = ai_models.checking_expire(select_value=value)
+    result = ai_models.checking_expire(select_site=request.POST.get('select_site'),
+                                       select_category=request.POST.get('select_category'))
     #  input site , and one of category ,if category = none , return all category
     #  或者 category ,以及其中一項site, 若site is none也可
 
+    result.sort(key=lambda row: row['exp_date'])
+    #  依照日期做排序 取出每一列的exp_data做升冪排序
     return result

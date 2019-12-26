@@ -25,10 +25,9 @@ urlpatterns = [
                     r'^data_center/',
                     include(
                         [
-                            re_path(r'module1/', DataCenter_views.api_checking_status_by_category),
-                            re_path(r'module2/', DataCenter_views.api_checking_status_by_site),
-                            re_path(r'module3/', DataCenter_views.api_checking_status_by_category),
-                            re_path(r'module4/', DataCenter_views.api_get_all_data),
+                            re_path(r'select_category_by_site/', DataCenter_views.api_checking_status_by_category),
+                            re_path(r'select_site_by_category/', DataCenter_views.api_checking_status_by_site),
+                            re_path(r'get_all_data/', DataCenter_views.api_get_all_data),
                         ]
                     )
                 )
