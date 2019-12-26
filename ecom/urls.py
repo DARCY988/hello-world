@@ -1,6 +1,8 @@
 from django.urls import include, re_path
 from . import views
 from .ecn import ecn_views
+from .dataCenter import DataCenter_views
+
 
 app_name = 'ecom'
 
@@ -19,6 +21,16 @@ urlpatterns = [
                         ]
                     )
                 ),
+                re_path(
+                    r'^data_center/',
+                    include(
+                        [
+                            re_path(r'select_category_by_site/', DataCenter_views.api_checking_status_by_category),
+                            re_path(r'select_site_by_category/', DataCenter_views.api_checking_status_by_site),
+                            re_path(r'get_all_data/', DataCenter_views.api_get_all_data),
+                        ]
+                    )
+                )
                 # Add your api path here,
                 # Example. re_path(r'^<custom url path>/', views.<function>),
             ]
