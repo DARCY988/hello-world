@@ -1,7 +1,8 @@
 from fii_ai_api.utils.response import fii_api_handler
 from .dbio import ECNMySQLIO, AgileMySQLIO
+from .notify import MailCenter
 from .fileio import FileFormIO
-from .models import count_by_category, count_by_site, list_all_cert, list_all_ecn
+from . import models
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import os
@@ -18,7 +19,15 @@ def category_cert_view(request, debug, api_version, site=None):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    result = count_by_category(db, site)
+    result = models.count_by_category(db, site)
+
+    mail_service = MailCenter(debug=debug, api_version=api_version)
+
+    models.alarm(
+        mail_service=mail_service,
+        subject='ECN Error!',
+        text_content='Find ECN different.'
+    )
 
     return Response(result)
 
@@ -28,7 +37,7 @@ def site_cert_view(request, debug, api_version, category):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    result = count_by_site(db, category)
+    result = models.count_by_site(db, category)
 
     return Response(result)
 
@@ -41,7 +50,7 @@ def all_cert_view(request, debug, api_version):
     category = request.GET.get('category', None)
     site = request.GET.get('site', None)
 
-    result = list_all_cert(db, category, site)
+    result = models.list_all_cert(db, category, site)
 
     return Response(result)
 
@@ -52,7 +61,7 @@ def all_ecn_view(request, debug, api_version, site=None):
     agile_db = AgileMySQLIO(debug=debug, api_version=api_version)
     ecn_db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    result = list_all_ecn(agile_db, ecn_db, site)
+    result = models.list_all_ecn(agile_db, ecn_db, site)
 
     return Response(result)
 

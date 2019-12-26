@@ -1,8 +1,8 @@
-from .fileio import FileFormIO
 from pandas import DataFrame
+from datetime import datetime, timezone, timedelta
 
 
-# ECN Tab
+# Cert Tab
 def count_by_category(dbio, site):
     categories = [
         'CCC',
@@ -116,7 +116,7 @@ def list_all_ecn(agile_dbio, ecn_dbio, site):
         pn = agile_df.iloc[agile_row]['pn']
         manufacturer = agile_df.iloc[agile_row]['manufacturer']
 
-        # Mapping PN
+        # Mapping two tables by PN
         filtered_cert_df = cert_df[cert_df['PN'][:-3] == pn[:-3]]
 
         for cert_row in range(0, len(filtered_cert_df.index)):
@@ -146,3 +146,31 @@ def list_all_ecn(agile_dbio, ecn_dbio, site):
             )
 
     return result
+
+
+# Utils
+def alarm(mail_service, subject, text_content, attachments=None):
+    alarm_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+    notify_list = [
+        'BonJu <bonju.huang@gmail.com>',
+    ]
+    cc_list = [
+        'IAI Alarm Center <iai_reply@163.com>',
+    ]
+    mail_service.send_alarm(
+        subject=subject,
+        message=alarm_time + ' ' + text_content,
+        recipient_list=notify_list,
+        cc=cc_list,
+        attachments=attachments
+    )
+    # send_mail(
+    #     subject='ECN Alarm',
+    #     text_content='This is a mail sent from IAI Innovation Application Department.',
+    #     html_content='<p>This is an <strong>IMPORTANT</strong> notification.</p>',
+    #     send_to=notify_list,
+    #     cc=cc_list,
+    #     headers=headers
+    # )
+
+    return 'Alarm Complete.'
