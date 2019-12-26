@@ -4,7 +4,7 @@ from .fileio import FileFormIO
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import os
-from . import ai_models
+from . import models
 
 # Build path in this module like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 def api_checking_status_by_category(request, debug, api_version  # these three parameters always place at index 0:2
                                     ):  # Add your parameters here
 
-    result = ai_models.checking_status_by_category('category', select_site=request.POST.get('select_site'))
+    result = models.checking_status_by_category('category', select_site=request.POST.get('select_site'))
 
     return result
 
@@ -27,7 +27,7 @@ def api_checking_status_by_category(request, debug, api_version  # these three p
 def api_checking_status_by_site(request, debug, api_version  # these three parameters always place at index 0:2
                                 ):  # Add your parameters here
 
-    result = ai_models.checking_status_by_site('site', select_category=request.POST.get('select_category'))
+    result = models.checking_status_by_site('site', select_category=request.POST.get('select_category'))
 
     return result
 
@@ -36,7 +36,7 @@ def api_checking_status_by_site(request, debug, api_version  # these three param
 def api_get_all_data(request, debug, api_version  # these three parameters always place at index 0:2
                      ):  # Add your parameters here
 
-    result = ai_models.checking_expire(select_site=request.POST.get('select_site'),
+    result = models.checking_expire(select_site=request.POST.get('select_site'),
                                        select_category=request.POST.get('select_category'))
     #  input site , and one of category ,if category = none , return all category
     #  或者 category ,以及其中一項site, 若site is none也可
