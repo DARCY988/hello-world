@@ -29,7 +29,7 @@ def checking_expire(**kwargs):  # EX: category = ccc or site = FOC
                        'exp_date' : row['exp_date'],
                        'status' : ord(row['status']),
                        'upload' : row['upload'],
-                       'Date' : row['Date'],
+                       'update_time' : row['update_time'],
                        'exp_date_status' : status
                        })
     return result
@@ -58,11 +58,11 @@ def checking_status_by_site(column, **kwargs):  # EX: column = site , kwargs {ca
     result = []
     site_list = ['FCZ', 'FTX', 'FJZ', 'FOC', 'FOL']
     coord = {
-        "FCZ": [49.9493036, 15.2120232],
-        "FTX": [44.8204983, -94.0602476],
-        "FJZ": [31.6859596, -106.543702],
-        "FOC": [22.7198832, 114.0491412],
-        "FOL": [22.6764474, 113.899891]}
+        "FCZ": [15.2120232, 49.9493036],
+        "FTX": [-94.0602476, 44.8204983],
+        "FJZ": [-106.543702, 31.6859596],
+        "FOC": [115.0491412, 27.7198832],
+        "FOL": [113.899891, 18.6764474]}
 
     for site_value in site_list:
         status = 1  # 預設證書狀態為1:有效

@@ -21,7 +21,7 @@ class DataCenterMySQLIO(MySQL):
         if select_site and select_category :
             select_category = ' AND ' + 'category' + ' = ' + '\'' + kwargs['select_category'] + '\''
 
-        get_column = 'site, category, cert_no, applicant, pid, issue_date, exp_date, status,upload, upload Date'
+        get_column = 'site, category, cert_no, applicant, pid, issue_date, exp_date, status, upload, update_time'
         #  get_column 要顯示的欄位
 
         sql = '''

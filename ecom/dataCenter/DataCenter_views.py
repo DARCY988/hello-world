@@ -37,7 +37,7 @@ def api_get_all_data(request, debug, api_version  # these three parameters alway
                      ):  # Add your parameters here
 
     result = models.checking_expire(select_site=request.POST.get('select_site'),
-                                       select_category=request.POST.get('select_category'))
+                                    select_category=request.POST.get('select_category'))
     #  input site , and one of category ,if category = none , return all category
     #  或者 category ,以及其中一項site, 若site is none也可
 
