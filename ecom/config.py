@@ -1,5 +1,5 @@
 # Add your name into the list
-__CONTRIBUTORS__ = ['BonJu']
+__CONTRIBUTORS__ = ['BonJu', 'Leo']
 
 # API version
 __API_VERSION__ = ['latest', 'v2.0']
@@ -13,6 +13,7 @@ MYSQL_product_table = {
     'ECN': 'ECN',
     'ECN_CCL': 'ECN_CCL',
     'ECN_model': 'ECN_model',
+    'DataCenter' : 'DataCenter'
 }
 
 AGILE_product_table = {
@@ -25,6 +26,7 @@ MYSQL_test_table = {
     'ECN': 'ECN_copy1',
     'ECN_CCL': 'ECN_CCL_copy1',
     'ECN_model': 'ECN_model_copy1',
+    'DataCenter' : 'DataCenter_test'
 }
 
 AGILE_test_table = {
@@ -32,7 +34,7 @@ AGILE_test_table = {
     'PN': 'PN',
 }
 
-# MySQL login account and password
+# MySQL login accout and password
 MYSQL_login_info = {
     'username': 'EUser',
     'password': 'Efoxconn88',
@@ -54,7 +56,7 @@ AGILE_login_info = {
     'test_table': AGILE_test_table
 }
 
-# # Local MySQL login account and password
+# # bonju0102 local MySQL login accout and password
 # MYSQL_login_info = {
 #     'username': 'api',
 #     'password': 'foxconn168!!',
@@ -64,6 +66,19 @@ AGILE_login_info = {
 #     'prod_table': MYSQL_product_table,
 #     'test_table': MYSQL_test_table
 # }
+
+
+# #  leolee loacl MySQL login accout and password
+# MYSQL_login_info = {
+#     'username': 'root',
+#     'password': '55665566',
+#     'hostname': '127.0.0.1',
+#     'port': 3306,
+#     'db_name': 'test',
+#     'prod_table': MYSQL_product_table,
+#     'test_table': MYSQL_test_table
+# }
+
 
 # Mail settings
 MAIL_product_setting = {

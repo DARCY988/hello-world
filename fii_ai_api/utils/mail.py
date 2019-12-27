@@ -29,8 +29,66 @@ class BasicMail(object):
             **kwargs
         )
 
-    def send_mail(self, subject, message, from_email, recipient_list, cc, attachments=None,
+    def send_mail(self, subject, message, from_email, recipient_list, cc=None, attachments=None,
                   fail_silently=False, connection=None, html_message=None):
+        ''' Send mail
+        Parameters
+        --------------
+        subject: str
+            Mail title. It is important for mail server to recognize whether this mail is spam or not.
+
+        message: str
+            Mail body message.
+
+        from_mail: str
+            The sender name and email shown to the recipients.
+            Example:
+            ```
+            'Name <no-reply@example.com>'
+            ```
+
+        recipient_list: list
+            A list of strings, each an email address. Each member of recipient_list
+            will see the other recipients in the “To:” field of the email message.
+            Example:
+            ```
+            ['123@example.com', '456@example.com', ...]
+            ```
+
+        cc: list
+            CC list.
+            Example:
+            ```
+            ['admin_1@example.com', 'admin_2@example.com', ...]
+            ```
+
+        attachments: str
+            The file path you want to attach. Attach single file for each time.
+            Example:
+            ```
+            '.../documents/filename'
+            ```
+
+        fail_silently: Boolean
+            When it’s False, send_mail() will raise an smtplib.SMTPException
+            if an error occurs. See the smtplib docs for a list of possible
+            exceptions, all of which are subclasses of SMTPException.
+
+        connection: EmailBackend
+            The optional email backend to use to send the mail. If unspecified, an
+            instance of the default backend will be used. See the documentation on
+            Email backends for more details.
+
+        html_message: str
+            If html_message is provided, the resulting email will be a multipart/alternative
+            email with message as the text/plain content type and html_message as the
+            text/html content type.
+
+        Return
+        --------------
+        mail.send(): int
+            The number of email messages sent.
+        '''
         connection = connection or self.connection
         from_email = from_email or self.from_email
         recipient_list = recipient_list or self.recipient_list
