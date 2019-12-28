@@ -1,7 +1,7 @@
 """
 Mail service class.
 """
-from django.core.mail import get_connection, EmailMultiAlternatives
+from django.core.mail import get_connection, EmailMultiAlternatives, EmailMessage
 import os
 import inspect
 import importlib
@@ -104,6 +104,37 @@ class BasicMail(object):
             mail.attach_alternative(html_message, 'text/html')
 
         return mail.send()
+
+    def send_mass_mail(self, datatuple, fail_silently=False, connection=None):
+        ''' Send multiple mails
+        Parameters
+        --------------
+        datatuple: tuple
+            Given a datatuple of (subject, message, from_email, recipient_list), send
+            each message to each recipient list. Return the number of emails sent.
+            If from_email is None, use the DEFAULT_FROM_EMAIL setting.
+
+        fail_silently: Boolean
+            When it’s False, send_mail() will raise an smtplib.SMTPException
+            if an error occurs. See the smtplib docs for a list of possible
+            exceptions, all of which are subclasses of SMTPException.
+
+        connection: EmailBackend
+            The optional email backend to use to send the mail. If unspecified, an
+            instance of the default backend will be used. See the documentation on
+            Email backends for more details.
+
+        Return
+        --------------
+        connection.send_messages(messages): int
+            The number of email messages sent.
+        '''
+        connection = connection or self.connection
+        messages = [
+            EmailMessage(subject, message, sender, recipient, connection=connection)
+            for subject, message, sender, recipient in datatuple
+        ]
+        return connection.send_messages(messages)
 
 
 class MailService(BasicMail):
