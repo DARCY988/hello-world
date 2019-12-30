@@ -6,6 +6,31 @@ __API_VERSION__ = ['latest', 'v2.0']
 
 
 # -------------------- #
+# Common Information
+# -------------------- #
+# Category list
+__CATEGORIES__ = [
+    'CCC',
+    'CSA',
+    'ETL',
+    'IECEx',
+    'MET',
+    'Nemko',
+    'TUV',
+    'UL',
+]
+
+# Site list
+__LOCATIONS__ = {
+    "FCZ": [15.2120232, 49.9493036],
+    "FOC": [115.0491412, 27.7198832],
+    "FOL": [113.899891, 18.6764474],
+    "FTX": [-94.0602476, 44.8204983],
+    "FJZ": [-106.543702, 31.6859596],
+}
+
+
+# -------------------- #
 # DB Information
 # -------------------- #
 # Production Table
@@ -80,7 +105,10 @@ AGILE_login_info = {
 # }
 
 
-# Mail settings
+# -------------------- #
+# Mail Information
+# -------------------- #
+# Production settings
 MAIL_product_setting = {
     'use_ssl': True,
     'use_tls': False,
@@ -94,6 +122,7 @@ MAIL_product_setting = {
     ],
 }
 
+# Test settings
 MAIL_test_setting = {
     'use_ssl': True,
     'use_tls': False,

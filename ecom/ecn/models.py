@@ -1,20 +1,11 @@
 from pandas import DataFrame
 from datetime import datetime, timezone, timedelta
+from ecom.config import __CATEGORIES__, __LOCATIONS__
 
 
 # Cert Tab
 def count_by_category(dbio, site):
-    categories = [
-        'CCC',
-        'CSA',
-        'ETL',
-        'IECEx',
-        'MET',
-        'Nemko',
-        'TUV',
-        'UL',
-    ]
-
+    categories = __CATEGORIES__.copy()
     data = dbio.cert_amount('category', 'site' if site else None, site)
 
     # TODO: Check Agile system and get the status
@@ -36,14 +27,7 @@ def count_by_category(dbio, site):
 
 
 def count_by_site(dbio, category):
-    locations = {
-        "FCZ": [15.2120232, 49.9493036],
-        "FOC": [115.0491412, 27.7198832],
-        "FOL": [113.899891, 18.6764474],
-        "FTX": [-94.0602476, 44.8204983],
-        "FJZ": [-106.543702, 31.6859596],
-    }
-
+    locations = __LOCATIONS__.copy()
     data = dbio.cert_amount('site', 'category' if category else None, category)
 
     # TODO: Check Agile system and get the status
