@@ -79,7 +79,7 @@ def count_by_site(dbio, category):
 
 
 def list_all_cert(dbio, category, site):
-    data = dbio.ecn_info(category, site)
+    data = dbio.read_ecn_info(category, site)
 
     # TODO: Check Agile system and get the status
 
@@ -104,10 +104,17 @@ def list_all_cert(dbio, category, site):
     return result
 
 
+def edit_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, spec, PN, updater, update_time,
+                    new_PN=None, new_supplier=None, new_model=None, new_spec=None):
+    result = dbio.update_cert_info(site, category, cert_no, pid, CCL, supplier, model, spec, PN, updater, update_time,
+                                   new_PN, new_supplier, new_model, new_spec)
+    return result
+
+
 # Agile Tab
-def list_all_ecn(agile_dbio, ecn_dbio, site):
-    agile_df = agile_dbio.agile_info(site)
-    cert_df = ecn_dbio.ecn_info(site)
+def list_all_ecn(agile_dbio, ecn_dbio, site):   # TODO: Make sure database table is correct.
+    agile_df = agile_dbio.read_agile_info(site)
+    cert_df = ecn_dbio.read_ecn_info(site)
 
     result = []
     for agile_row in range(0, len(agile_df.index)):
@@ -149,28 +156,20 @@ def list_all_ecn(agile_dbio, ecn_dbio, site):
 
 
 # Utils
-def alarm(mail_service, subject, text_content, attachments=None):
-    alarm_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-    notify_list = [
-        'BonJu <bonju.huang@gmail.com>',
-    ]
-    cc_list = [
-        'IAI Alarm Center <iai_reply@163.com>',
-    ]
-    mail_service.send_alarm(
-        subject=subject,
-        message=alarm_time + ' ' + text_content,
-        recipient_list=notify_list,
-        cc=cc_list,
-        attachments=attachments
-    )
-    # send_mail(
-    #     subject='ECN Alarm',
-    #     text_content='This is a mail sent from IAI Innovation Application Department.',
-    #     html_content='<p>This is an <strong>IMPORTANT</strong> notification.</p>',
-    #     send_to=notify_list,
-    #     cc=cc_list,
-    #     headers=headers
-    # )
+# def _alarm(mail_service, subject, text_content, attachments=None):
+#     alarm_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+#     notify_list = [
+#         'BonJu <bonju.huang@gmail.com>',
+#     ]
+#     cc_list = [
+#         'IAI Alarm Center <iai_reply@163.com>',
+#     ]
+#     mail_service.send_alarm(
+#         subject=subject,
+#         message=alarm_time + ' ' + text_content,
+#         recipient_list=notify_list,
+#         cc=cc_list,
+#         attachments=attachments
+#     )
 
-    return 'Alarm Complete.'
+#     return 'Alarm Complete.'

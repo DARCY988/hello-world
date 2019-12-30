@@ -3,7 +3,7 @@ from .dbio import ECNMySQLIO, AgileMySQLIO
 from .notify import MailCenter
 from .fileio import FileFormIO
 from .models import (
-    count_by_category, count_by_site, list_all_cert, list_all_ecn, alarm
+    count_by_category, count_by_site, list_all_cert, list_all_ecn
 )
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -20,6 +20,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 def category_cert_view(request, debug, api_version, site=None):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
+    # mail = MailCenter(debug=debug, api_version=api_version)
 
     result = count_by_category(db, site)
 
@@ -30,6 +31,7 @@ def category_cert_view(request, debug, api_version, site=None):
 def site_cert_view(request, debug, api_version, category):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
+    # mail = MailCenter(debug=debug, api_version=api_version)
 
     result = count_by_site(db, category)
 
@@ -45,15 +47,6 @@ def all_cert_view(request, debug, api_version):
     site = request.GET.get('site', None)
 
     result = list_all_cert(db, category, site)
-
-    # Alarm process
-    mail_service = MailCenter(debug=debug, api_version=api_version)
-
-    alarm(
-        mail_service=mail_service,
-        subject='ECN Error!',
-        text_content='Find ECN different.'
-    )
 
     return Response(result)
 
@@ -73,15 +66,15 @@ def all_ecn_view(request, debug, api_version, site=None):
 # DataBase CRUD API
 # -------------------- #
 @fii_api_handler(['get'])
-def api_ecn_read(request, debug, api_version):  # Add your parameters here
+def api_ecn_read(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    return db.ecn_info()
+    return db.read_ecn_info()
 
 
 @fii_api_handler(['get'])
-def api_cert_count(request, debug, api_version, key):  # Add your parameters here
+def api_cert_count(request, debug, api_version, key):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
@@ -89,7 +82,7 @@ def api_cert_count(request, debug, api_version, key):  # Add your parameters her
 
 
 @api_view(['post'])
-def api_file_upload(request, debug, api_version):  # Add your parameters here
+def api_file_upload(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
@@ -111,7 +104,7 @@ def api_file_upload(request, debug, api_version):  # Add your parameters here
 
 
 @api_view(['get'])
-def api_file_download(request, debug, api_version, file_name):  # Add your parameters here
+def api_file_download(request, debug, api_version, file_name):
 
     path = os.path.join(BASE_DIR, 'doc')
     if request.method == 'GET':
@@ -123,7 +116,7 @@ def api_file_download(request, debug, api_version, file_name):  # Add your param
 
 
 @api_view(['get'])
-def api_file_preview(request, debug, api_version, file_name):  # Add your parameters here
+def api_file_preview(request, debug, api_version, file_name):
 
     path = os.path.join(BASE_DIR, 'doc')
     if request.method == 'GET':
@@ -135,7 +128,7 @@ def api_file_preview(request, debug, api_version, file_name):  # Add your parame
 
 
 @api_view(['delete'])
-def api_file_delete(request, debug, api_version, file_name):  # Add your parameters here
+def api_file_delete(request, debug, api_version, file_name):
 
     path = os.path.join(BASE_DIR, 'doc')
     if request.method == 'DELETE':
