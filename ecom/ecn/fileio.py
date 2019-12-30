@@ -23,8 +23,6 @@ class FileFormIO(FileHandler):
             model = excel_df.iloc[row][6]
             spec = excel_df.iloc[row][7]
             pn = excel_df.iloc[row][8]
-            model_comp = pre_df.iloc[row][9]
-            pn_comp = pre_df.iloc[row][10]
             create_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
 
             result.append(
@@ -38,8 +36,6 @@ class FileFormIO(FileHandler):
                     'model': model,
                     'spec': spec,
                     'pn': pn,
-                    'model_comp': model_comp,
-                    'pn_comp': pn_comp,
                     'upload': uploader,
                     'create_time': create_time,
                 }
@@ -53,6 +49,6 @@ class FileFormIO(FileHandler):
                 dbio.create_ccl(ccl, pn)
 
             if not dbio.check_duplicated(dbio.db_tables['ECN_model'], 'model', model):
-                dbio.create_model(supplier, model, spec, pn, model_comp, pn_comp, cert_no)
+                dbio.create_model(supplier, model, spec, pn, cert_no)
 
         return result

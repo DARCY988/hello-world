@@ -10,8 +10,7 @@ class ECNMySQLIO(MySQL):
     def read_cert_info(self, category=None, site=None):
         sql = '''
         SELECT ecn.site, ecn.category, ecn.cert_no, ecn.pid, ccl.CCL,
-        model.supplier, model.model, model.spec, model.PN,
-        model.model_compare, model.PN_compare, ecn.upload, ecn.create_time
+        model.supplier, model.model, model.spec, model.PN, ecn.upload, ecn.create_time
         FROM `%(ecn)s` as ecn
         INNER JOIN `%(ecn_ccl)s` as ccl
         INNER JOIN `%(ecn_model)s` as model
@@ -75,13 +74,13 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql)
 
-    def create_model(self, supplier, model, spec, pn, model_comp, pn_comp, cert_no):
+    def create_model(self, supplier, model, spec, pn, cert_no):
         sql = '''
-        INSERT INTO `%(table)s` (supplier, model, spec, PN, model_compare, PN_compare, cert_no)
-        VALUES ('%(supplier)s', '%(model)s', '%(spec)s', '%(pn)s', '%(model_comp)s', '%(pn_comp)s', '%(cert_no)s')
+        INSERT INTO `%(table)s` (supplier, model, spec, PN, cert_no)
+        VALUES ('%(supplier)s', '%(model)s', '%(spec)s', '%(pn)s', '%(cert_no)s')
         ''' % (
-            {'table': self.db_tables['ECN_model'], 'supplier': supplier, 'model': model, 'spec': spec,
-             'pn': pn, 'model_comp': model_comp, 'pn_comp': pn_comp, 'cert_no': cert_no}
+            {'table': self.db_tables['ECN_model'], 'supplier': supplier,
+             'model': model, 'spec': spec, 'pn': pn, 'cert_no': cert_no}
         )
         return self.manipulate_db(sql)
 
