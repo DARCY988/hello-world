@@ -18,6 +18,7 @@ urlpatterns = [
                             re_path(r'category/(?P<site>\w+)*', ecn_views.category_cert_view),
                             re_path(r'site/(?P<category>\w+)*', ecn_views.site_cert_view),
                             re_path(r'all/', ecn_views.all_cert_view),
+                            re_path(r'edit/', ecn_views.edit_cert_view),
                         ]
                     )
                 ),

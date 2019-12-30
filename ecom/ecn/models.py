@@ -79,7 +79,7 @@ def count_by_site(dbio, category):
 
 
 def list_all_cert(dbio, category, site):
-    data = dbio.read_ecn_info(category, site)
+    data = dbio.read_cert_info(category, site)
 
     # TODO: Check Agile system and get the status
 
@@ -96,25 +96,50 @@ def list_all_cert(dbio, category, site):
                 'CCL Model': data.iloc[row]['model'],
                 'CCL Spec.': data.iloc[row]['spec'],
                 'CCL PN': data.iloc[row]['PN'],
-                # 'CCL Model compare': data.iloc[row]['model_compare'],
-                # 'CCL PN compare': data.iloc[row]['PN_compare'],
+                'Uploader': data.iloc[row]['upload'],
+                'Upload Time': data.iloc[row]['create_time'],
             }
         )
 
     return result
 
 
-def edit_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, spec, PN, updater, update_time,
+def edit_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, spec, PN, updater,
                     new_PN=None, new_supplier=None, new_model=None, new_spec=None):
-    result = dbio.update_cert_info(site, category, cert_no, pid, CCL, supplier, model, spec, PN, updater, update_time,
-                                   new_PN, new_supplier, new_model, new_spec)
+    update = new_PN or new_model or new_supplier or new_spec
+    if update:
+        update_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+
+        try:
+            dbio.update_cert_info(site, category, cert_no, pid, CCL, supplier, model, spec, PN,
+                                  updater, update_time, new_PN, new_supplier, new_model, new_spec)
+            result = {
+                'Site': site,
+                'Category': category,
+                'Certificate No.': cert_no,
+                'Product PID': pid,
+                'CCL': CCL,
+                'CCL Supplier': new_supplier if new_supplier else supplier,
+                'CCL Model': new_model if new_model else model,
+                'CCL Spec.': new_spec if new_spec else spec,
+                'CCL PN': new_PN if new_PN else PN,
+                'Uploader': updater,
+                'Upload Time': update_time,
+            }
+
+        except Exception as e:
+            print(e)
+            result = {
+                'message': 'Update Failed.'
+            }
+
     return result
 
 
 # Agile Tab
 def list_all_ecn(agile_dbio, ecn_dbio, site):   # TODO: Make sure database table is correct.
     agile_df = agile_dbio.read_agile_info(site)
-    cert_df = ecn_dbio.read_ecn_info(site)
+    cert_df = ecn_dbio.read_cert_info(site)
 
     result = []
     for agile_row in range(0, len(agile_df.index)):
