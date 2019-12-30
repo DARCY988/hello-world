@@ -1,14 +1,13 @@
 from django.db import models
 from fii_ai_api.utils.dbio.mysql import MySQL
-from ecom.config import MYSQL_login_info
+from ecom.config import MYSQL_login_info, AGILE_login_info
 
 
 class ECNMySQLIO(MySQL):
     def __init__(self, debug=False, db_tables={}, custom_login_info={}, **kwargs):
         super().__init__(debug=debug, db_tables=db_tables, login_info=MYSQL_login_info, **kwargs)
 
-    def ecn_info(self, category=None, site=None):
-
+    def read_cert_info(self, category=None, site=None):
         sql = '''
         SELECT ecn.site, ecn.category, ecn.cert_no, ecn.pid, ccl.CCL,
         model.supplier, model.model, model.spec, model.PN,
@@ -33,6 +32,7 @@ class ECNMySQLIO(MySQL):
         SELECT `%(target)s`, COUNT(DISTINCT cert_no) as 'amount' FROM `%(ecn)s`
         %(condition)s
         GROUP BY `%(target)s`
+        ORDER BY amount DESC
         ''' % (
             {'target': target, 'ecn': self.db_tables['ECN'],
              'condition': 'WHERE %s = "%s"' % (key, value) if (key and value) else ''}
@@ -55,6 +55,11 @@ class ECNMySQLIO(MySQL):
     #          'site': 'and ecn.site = "%s"' % site if site else ''}
     #     )
     #     return self.manipulate_db(sql, dtype='DataFrame')
+
+    # def create_cert_info(self, site, category, cert_no, pid, ccl, supplier, model, spec, pn, uploader, create_time):
+    #     sql = '''
+    #     INSERT INTO `%(ecn)s`
+    #     '''
 
     def create_ECN(self, site, category, cert_no, pid, uploader, create_time):
         sql = '''
@@ -85,6 +90,50 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql)
 
+    def update_cert_info(self, site, category, cert_no, pid, CCL, supplier, model, spec, PN, updater, update_time,
+                         new_PN=None, new_supplier=None, new_model=None, new_spec=None):
+        update = new_PN or new_model or new_supplier or new_spec
+        if update:
+            sql = '''
+            UPDATE `%(ecn)s` as ecn, `%(ecn_ccl)s` as ccl, `%(ecn_model)s` as model
+            SET %(update_pn)s %(update_supplier)s %(update_model)s %(update_spec)s %(update_uploader)s %(update_time)s
+            WHERE %(conditions)s
+            ''' % (
+                {
+                    # Tables
+                    'ecn': self.db_tables['ECN'],
+                    'ecn_ccl': self.db_tables['ECN_CCL'],
+                    'ecn_model': self.db_tables['ECN_model'],
+
+                    # Update item
+                    'update_pn': ('ccl.PN=%s, model.PN=%s,' % new_PN) if new_PN else '',
+                    'update_supplier': ('and model.supplier=%s,' % new_supplier) if new_supplier else '',
+                    'update_model': ('and model.model=%s,' % new_model) if new_model else '',
+                    'update_spec': ('and model.spec=%s,' % new_spec) if new_spec else '',
+                    'update_uploader': 'and ecn.upload=%s,' % updater,
+                    'update_time': 'and ecn.create_time=%s' % update_time,
+
+                    # Conditions
+                    'conditions': '''
+                                ccl.PN=%(old_pn)s and ccl.CCL=%(ccl)s and
+                                model.PN=%(old_pn)s and model.cert_no=%(cert_no)s and
+                                model.supplier=%(old_supplier)s and model.spec=%(old_spec)s and
+                                model.model=%(old_model)s and
+                                ecn.cert_no=%(cert_no)s and ecn.site=%(site)s and
+                                ecn.category=%(category)s and ecn.pid=%(pid)s
+                                ''' % ({'site': site, 'category': category, 'cert_no': cert_no,
+                                        'pid': pid, 'ccl': CCL,
+                                        'old_pn': PN, 'old_supplier': supplier, 'old_model': model, 'old_spec': spec})
+                }
+            )
+
+            result = self.manipulate_db(sql)
+
+        else:
+            result = False
+
+        return result
+
     def check_duplicated(self, table, key, value):
         sql = '''
         SELECT EXISTS(SELECT * FROM `%(table)s` WHERE %(key)s = '%(value)s') AS count
@@ -97,3 +146,21 @@ class ECNMySQLIO(MySQL):
             return False
         else:
             return True
+
+
+class AgileMySQLIO(MySQL):
+    def __init__(self, debug=False, db_tables={}, custom_login_info={}, **kwargs):
+        super().__init__(debug=debug, db_tables=db_tables, login_info=AGILE_login_info, **kwargs)
+
+    def read_agile_info(self, site=None):
+        sql = '''
+        SELECT ecn.no, ecn.pn, detail.manufacturer, detail.model FROM `%(ecn_table)s` as ecn
+        INNER JOIN `%(pn_table)s` as detail
+        WHERE ecn.pn = detail.pn
+        %(site)s
+        ''' % (
+            {'ecn_table': self.db_tables['ECN'], 'pn_table': self.db_tables['PN'],
+             'site': site if site else ''}
+        )
+
+        return self.manipulate_db(sql, dtype='DataFrame')
