@@ -98,7 +98,7 @@ def add_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, spe
     if not dbio.check_duplicated(dbio.db_tables['ECN_CCL'], 'PN', PN):
         dbio.create_CCL(CCL, PN)
 
-    if not dbio.check_duplicated(dbio.db_tables['ECN_model'], 'cert_no', cert_no, 'pn', pn, 'model', model):
+    if not dbio.check_duplicated(dbio.db_tables['ECN_model'], 'cert_no', cert_no, 'pn', PN, 'model', model):
         dbio.create_model(supplier, model, spec, PN, cert_no)
 
     result = {
