@@ -65,7 +65,7 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql)
 
-    def create_ccl(self, ccl, pn):
+    def create_CCL(self, ccl, pn):
         sql = '''
         INSERT INTO `%(table)s` (CCL, PN)
         VALUES ('%(CCL)s', '%(PN)s')
@@ -99,38 +99,69 @@ class ECNMySQLIO(MySQL):
                 'ecn_model': self.db_tables['ECN_model'],
 
                 # Update item
-                'update_pn': ('ccl.PN=%s, model.PN=%s,' % new_PN) if new_PN else '',
-                'update_supplier': ('and model.supplier=%s,' % new_supplier) if new_supplier else '',
-                'update_model': ('and model.model=%s,' % new_model) if new_model else '',
-                'update_spec': ('and model.spec=%s,' % new_spec) if new_spec else '',
-                'update_uploader': 'and ecn.upload=%s,' % updater,
-                'update_time': 'and ecn.create_time=%s' % update_time,
+                'update_pn': ('ccl.PN="%s", model.PN="%s",' % (new_PN, new_PN)) if new_PN else '',
+                'update_supplier': ('model.supplier="%s",' % new_supplier) if new_supplier else '',
+                'update_model': ('model.model="%s",' % new_model) if new_model else '',
+                'update_spec': ('model.spec="%s",' % new_spec) if new_spec else '',
+                'update_uploader': 'ecn.upload="%s",' % updater,
+                'update_time': 'ecn.create_time="%s"' % update_time,
 
                 # Conditions
                 'conditions': '''
-                            ccl.PN=%(old_pn)s and ccl.CCL=%(ccl)s and
-                            model.PN=%(old_pn)s and model.cert_no=%(cert_no)s and
-                            model.supplier=%(old_supplier)s and model.spec=%(old_spec)s and
-                            model.model=%(old_model)s and
-                            ecn.cert_no=%(cert_no)s and ecn.site=%(site)s and
-                            ecn.category=%(category)s and ecn.pid=%(pid)s
-                            ''' % ({'site': site, 'category': category, 'cert_no': cert_no,
-                                    'pid': pid, 'ccl': CCL,
+                            ccl.PN='%(old_pn)s' and ccl.CCL='%(ccl)s' and
+                            model.PN='%(old_pn)s' and model.cert_no='%(cert_no)s' and
+                            model.supplier='%(old_supplier)s' and model.spec='%(old_spec)s' and
+                            model.model='%(old_model)s' and
+                            ecn.cert_no='%(cert_no)s' and ecn.site='%(site)s' and
+                            ecn.category='%(category)s' and ecn.pid='%(pid)s'
+                            ''' % ({'site': site, 'category': category, 'cert_no': cert_no, 'pid': pid, 'ccl': CCL,
                                     'old_pn': PN, 'old_supplier': supplier, 'old_model': model, 'old_spec': spec})
             }
         )
 
         return self.manipulate_db(sql)
 
-    def check_duplicated(self, table, key, value):
+    def delete_ECN(self, site, category, cert_no, pid):
         sql = '''
-        SELECT EXISTS(SELECT * FROM `%(table)s` WHERE %(key)s = '%(value)s') AS count
+        DELETE FROM `%(table)s` WHERE site='%(site)s' and category='%(category)s'
+        and cert_no='%(cert_no)s' and pid='%(pid)s'
         ''' % (
-            {'table': table, 'key': key, 'value': value}
+            {'table': self.db_tables['ECN'], 'site': site, 'category': category, 'cert_no': cert_no, 'pid': pid}
         )
-        result = self.manipulate_db(sql, dtype='DataFrame').iloc[0][0]
 
-        if result == 0:
+        return self.manipulate_db(sql)
+
+    def delete_CCL(self, ccl, pn):
+        sql = '''
+        DELETE FROM `%(table)s` WHERE CCL='%(ccl)s' and PN='%(pn)s'
+        ''' % (
+            {'table': self.db_tables['ECN_CCL'], 'ccl': ccl, 'pn': pn}
+        )
+
+        return self.manipulate_db(sql)
+
+    def delete_model(self, supplier, model, spec, pn, cert_no):
+        sql = '''
+        DELETE FROM `%(table)s` WHERE supplier='%(supplier)s' and model='%(model)s'
+        and spec='%(spec)s' and PN='%(pn)s' and cert_no='%(cert_no)s'
+        ''' % (
+            {'table': self.db_tables['ECN_model'], 'supplier': supplier, 'model': model,
+             'spec': spec, 'pn': pn, 'cert_no': cert_no}
+        )
+
+        return self.manipulate_db(sql)
+
+    def check_duplicated(self, table, key_a, value_a, key_b=None, value_b=None, key_c=None, value_c=None):
+        sql = '''
+        SELECT EXISTS(SELECT * FROM `%(table)s` WHERE %(key)s = '%(value)s' %(con_b)s %(con_c)s) AS count
+        ''' % (
+            {'table': table, 'key': key_a, 'value': value_a,
+             'con_b': 'and %s="%s"' % (key_b, value_b) if (key_b and value_b) else '',
+             'con_c': 'and %s="%s"' % (key_c, value_c) if (key_c and value_c) else ''}
+        )
+        count = self.manipulate_db(sql, dtype='DataFrame').iloc[0][0]
+
+        if count == 0:
             return False
         else:
             return True

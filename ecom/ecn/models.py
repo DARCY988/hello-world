@@ -74,16 +74,46 @@ def list_all_cert(dbio, category, site):
                 'Site': data.iloc[row]['site'],
                 'Category': data.iloc[row]['category'],
                 'Certificate No.': data.iloc[row]['cert_no'],
-                'Product PID': data.iloc[row]['pid'],
+                'PID': data.iloc[row]['pid'],
                 'CCL': data.iloc[row]['CCL'],
                 'CCL Supplier': data.iloc[row]['supplier'],
                 'CCL Model': data.iloc[row]['model'],
-                'CCL Spec.': data.iloc[row]['spec'],
-                'CCL PN': data.iloc[row]['PN'],
+                'Spec.': data.iloc[row]['spec'],
+                'PN': data.iloc[row]['PN'],
                 'Uploader': data.iloc[row]['upload'],
                 'Upload Time': data.iloc[row]['create_time'],
             }
         )
+
+    return result
+
+
+def add_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, spec, PN, uploader):
+    create_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+
+    # Avoid duplicated
+    if not dbio.check_duplicated(dbio.db_tables['ECN'], 'cert_no', cert_no):
+        dbio.create_ECN(site, category, cert_no, pid, uploader, create_time)
+
+    if not dbio.check_duplicated(dbio.db_tables['ECN_CCL'], 'PN', PN):
+        dbio.create_CCL(CCL, PN)
+
+    if not dbio.check_duplicated(dbio.db_tables['ECN_model'], 'cert_no', cert_no, 'pn', pn, 'model', model):
+        dbio.create_model(supplier, model, spec, PN, cert_no)
+
+    result = {
+        'Site': site,
+        'Category': category,
+        'Certificate No.': cert_no,
+        'PID': pid,
+        'CCL': CCL,
+        'CCL Supplier': supplier,
+        'CCL Model': model,
+        'Spec.': spec,
+        'PN': PN,
+        'Uploader': uploader,
+        'Upload Time': create_time,
+    }
 
     return result
 
@@ -94,28 +124,33 @@ def edit_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, sp
     if update:
         update_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
 
-        try:
-            dbio.update_cert_info(site, category, cert_no, pid, CCL, supplier, model, spec, PN,
-                                  updater, update_time, new_PN, new_supplier, new_model, new_spec)
-            result = {
-                'Site': site,
-                'Category': category,
-                'Certificate No.': cert_no,
-                'Product PID': pid,
-                'CCL': CCL,
-                'CCL Supplier': new_supplier if new_supplier else supplier,
-                'CCL Model': new_model if new_model else model,
-                'CCL Spec.': new_spec if new_spec else spec,
-                'CCL PN': new_PN if new_PN else PN,
-                'Uploader': updater,
-                'Upload Time': update_time,
-            }
+        dbio.update_cert_info(site, category, cert_no, pid, CCL, supplier, model, spec, PN,
+                              updater, update_time, new_PN, new_supplier, new_model, new_spec)
+        result = {
+            'Site': site,
+            'Category': category,
+            'Certificate No.': cert_no,
+            'Product PID': pid,
+            'CCL': CCL,
+            'CCL Supplier': new_supplier if new_supplier else supplier,
+            'CCL Model': new_model if new_model else model,
+            'Spec.': new_spec if new_spec else spec,
+            'PN': new_PN if new_PN else PN,
+            'Uploader': updater,
+            'Upload time': update_time,
+        }
 
-        except Exception as e:
-            print(e)
-            result = {
-                'message': 'Update Failed.'
-            }
+    return result
+
+
+def delete_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, spec, PN):
+    dbio.delete_ECN(site, category, cert_no, pid)
+    dbio.delete_CCL(CCL, PN)
+    dbio.delete_model(supplier, model, spec, PN, cert_no)
+
+    result = {
+        'message': 'Data deleted.'
+    }
 
     return result
 
