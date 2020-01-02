@@ -13,7 +13,8 @@ MYSQL_product_table = {
     'ECN': 'ECN',
     'ECN_CCL': 'ECN_CCL',
     'ECN_model': 'ECN_model',
-    'DataCenter' : 'DataCenter'
+    'DataCenter' : 'DataCenter',
+    'DC_upload' : 'DC_upload'
 }
 
 AGILE_product_table = {
@@ -26,7 +27,8 @@ MYSQL_test_table = {
     'ECN': 'ECN_copy1',
     'ECN_CCL': 'ECN_CCL_copy1',
     'ECN_model': 'ECN_model_copy1',
-    'DataCenter' : 'DataCenter_test'
+    'DataCenter' : 'DataCenter_test',
+    'DC_upload' : 'DC_upload'
 }
 
 AGILE_test_table = {
