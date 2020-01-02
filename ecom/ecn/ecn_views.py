@@ -103,6 +103,18 @@ def all_cert_view(request, debug, api_version):
     return Response(result)
 
 
+# @api_view(['get'])
+# def file_preview(request, debug, api_version, file_name):
+
+#     path = os.path.join(BASE_DIR, 'doc')
+
+#     # Do preview method.
+#     fileio = FileFormIO()
+#     result = fileio.preview(path, file_name)
+
+#     return result
+
+
 # Agile Tab
 @api_view(['get'])
 def all_ecn_view(request, debug, api_version, site=None):
@@ -138,8 +150,6 @@ def api_file_io(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    # path = os.path.join(BASE_DIR, 'doc')
-    # status = {}
     if request.method == 'POST':
         fileio = FileFormIO(request.POST, request.FILES)
         files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
@@ -148,11 +158,6 @@ def api_file_io(request, debug, api_version):
                 # Read file and save to db
                 result = fileio.read_ecn(f, db, request.POST.get('user'))
 
-                # Save file
-                # status[f.name] = {
-                #     'status': fileio.save(f, path)
-                # }
-
     # elif request.method == 'GET':
     #     result = fileio.download(path, file_name)
 
@@ -160,15 +165,3 @@ def api_file_io(request, debug, api_version):
     #     result = fileio.delete(path, file_name)
 
     return result
-
-
-# @api_view(['get'])
-# def api_file_preview(request, debug, api_version, file_name):
-
-#     path = os.path.join(BASE_DIR, 'doc')
-
-#     # Do preview method.
-#     fileio = FileFormIO()
-#     result = fileio.preview(path, file_name)
-
-#     return result
