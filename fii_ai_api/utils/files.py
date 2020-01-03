@@ -187,4 +187,7 @@ class FileHandler(forms.Form):
                 'message': 'File \'%s\' not found.' % (file_name)
             }
 
+        if not os.listdir(path):
+            os.removedirs(path)
+
         return Response(result)

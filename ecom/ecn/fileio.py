@@ -4,9 +4,10 @@ from pandas import DataFrame, read_excel
 
 
 class FileFormIO(FileHandler):
-    def read(self, file, dbio, uploader):
+    def read_ecn(self, file, dbio, uploader):
 
         # Read excel file
+        # BUG: pandas.read_excel need xlrd package, need to confirm with Bean.
         pre_df = read_excel(file, sheet_name=0, index_col=0, header=0)
         excel_df = pre_df.fillna(method='ffill')
         pre_df.fillna('', inplace=True)
