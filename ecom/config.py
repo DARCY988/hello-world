@@ -13,7 +13,7 @@ MYSQL_product_table = {
     'ECN': 'ECN',
     'ECN_CCL': 'ECN_CCL',
     'ECN_model': 'ECN_model',
-    'DataCenter' : 'DataCenter_test',
+    'DataCenter' : 'DataCenter',
     'DC_upload' : 'DC_upload'
 }
 
@@ -26,16 +26,16 @@ MYSQL_test_table = {
     'DC_upload' : 'DC_upload'
 }
 
-# # MySQL login accout and password
-# MYSQL_login_info = {
-#     'username': 'EUser',
-#     'password': 'Efoxconn88',
-#     'hostname': '10.124.131.81',
-#     'port': 8872,
-#     'db_name': 'ECompliance',
-#     'prod_table': MYSQL_product_table,
-#     'test_table': MYSQL_test_table
-# }
+# MySQL login accout and password
+MYSQL_login_info = {
+    'username': 'EUser',
+    'password': 'Efoxconn88',
+    'hostname': '10.124.131.81',
+    'port': 8872,
+    'db_name': 'ECompliance',
+    'prod_table': MYSQL_product_table,
+    'test_table': MYSQL_test_table
+}
 
 # # Local MySQL login accout and password
 # MYSQL_login_info = {
@@ -49,13 +49,13 @@ MYSQL_test_table = {
 # }
 
 
-#  leolee loacl MySQL login accout and password
-MYSQL_login_info = {
-    'username': 'root',
-    'password': '55665566',
-    'hostname': '127.0.0.1',
-    'port': 3306,
-    'db_name': 'test',
-    'prod_table': MYSQL_product_table,
-    'test_table': MYSQL_test_table
-}
+# #  leolee loacl MySQL login accout and password
+# MYSQL_login_info = {
+#     'username': 'root',
+#     'password': '55665566',
+#     'hostname': '127.0.0.1',
+#     'port': 3306,
+#     'db_name': 'test',
+#     'prod_table': MYSQL_product_table,
+#     'test_table': MYSQL_test_table
+# }
