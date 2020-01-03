@@ -12,70 +12,137 @@ BASE_DIR = os.path.join(STATIC_ROOT, 'audit')
 
 
 def info_upload(request, dbio, uploader):
-    upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-    path = os.path.join(BASE_DIR, 'info')
-    site = request.POST.get('site')
+    f_type = request.POST.get('file_type')
+    type_dict = {
+        'ISO9001 Certificate': 1,
+        'Business License': 2,
+        'ODM/OEM Agreement': 3,
+        'Factory Introduction': 4,
+        'Company Org': 5,
+        'CNAS Certificate': 6,
+    }
 
-    # Handle files
-    fileio = FileFormIO(request.POST, request.FILES)
-    files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
-    if fileio.is_valid():
-        for f in files:
-            # Insert into db
-            dbio.create_file('FAInfo_upload', 'site', site, f.name, path, uploader, upload_time)
-            # Save file
-            path = os.path.join(path, site)
-            fileio.save(f, path)
+    if f_type in type_dict.keys():  # Check whether file_type is in formatted list.
+        upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+        path = os.path.join(BASE_DIR, 'info')
+        site = request.POST.get('site')
 
-    return path
+        # Handle files
+        fileio = FileFormIO(request.POST, request.FILES)
+        files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
+        if fileio.is_valid():
+            finish = []
+            for f in files:
+                # Insert into db
+                dbio.create_file('FAInfo_upload', 'site', site, f.name, path, uploader, upload_time, type_dict[f_type])
+                # Save file
+                path = os.path.join(path, site)
+                fileio.save(f, path)
+
+                finish.append(f.name)
+
+        result = {
+            'message': 'File %s uploaded successfully.' % ', '.join(finish)
+        }
+
+    else:
+        result = {
+            'message': 'Type not existed.'
+        }
+
+    return result
 
 
 def report_upload(request, dbio, uploader):
-    # Keys to get seq
-    site = request.POST.get('site')
-    category = request.POST.get('category')
+    f_type = request.POST.get('file_type')
+    type_dict = {
+        'Audit Report/Self-inspection Report': 1,
+        'CAR': 2,
+    }
 
-    upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-    path = os.path.join(BASE_DIR, 'report')
-    report_seq = dbio.get_seq('FAReport', site=site, category=category)
-    f_type = request.POST.get('type')
+    if f_type in type_dict.keys():  # Check whether file_type is in formatted list.
+        # Keys to get seq
+        site = request.POST.get('site')
+        category = request.POST.get('category')
 
-    # Handle files
-    fileio = FileFormIO(request.POST, request.FILES)
-    files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
-    if fileio.is_valid():
-        for f in files:
-            # Insert into db
-            dbio.create_file('FAReport_upload', 'FAReport_seq', report_seq, f.name, path, uploader, upload_time, f_type)
-            # Save file
-            path = os.path.join(path, report_seq)
-            fileio.save(f, path)
+        upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+        path = os.path.join(BASE_DIR, 'report')
+        report_seq = dbio.get_seq('FAReport', site=site, category=category)
 
-    return path
+        # Handle files
+        fileio = FileFormIO(request.POST, request.FILES)
+        files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
+        if fileio.is_valid():
+            finish = []
+            for f in files:
+                # Insert into db
+                dbio.create_file('FAReport_upload', 'FAReport_seq', report_seq,
+                                 f.name, path, uploader, upload_time, type_dict[f_type])
+                # Save file
+                path = os.path.join(path, report_seq)
+                fileio.save(f, path)
+
+                finish.append(f.name)
+
+        result = {
+            'message': 'File %s uploaded successfully.' % ', '.join(finish)
+        }
+
+    else:
+        result = {
+            'message': 'Type not existed.'
+        }
+
+    return result
 
 
 def check_upload(request, dbio, uploader):
-    # Keys to get seq
-    site = request.POST.get('site')
-    category = request.POST.get('category')
-    sample_category = request.POST.get('sample_category')
-    sample_pid = request.POST.get('sample_pid')
+    f_type = request.POST.get('file_type')
+    type_dict = {
+        'Validation Report': 1,
+        'PMP': 2,
+        'SOP': 3,
+        'SIP': 4,
+        'CCL Certificate': 5,
+        'In-coming Inspection Report': 6,
+        'Internal Audit Report': 7,
+        'Other': 8,
+    }
 
-    upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-    path = os.path.join(BASE_DIR, 'check')
-    check_seq = dbio.get_seq('FACheck', site=site, category=category,
-                             sample_category=sample_category, sample_pid=sample_pid)
-    f_type = request.POST.get('type')
+    if f_type in type_dict.keys():  # Check whether file_type is in formatted list.
+        # Keys to get seq
+        site = request.POST.get('site')
+        category = request.POST.get('category')
+        sample_category = request.POST.get('sample_category')
+        sample_pid = request.POST.get('sample_pid')
 
-    # Handle files
-    fileio = FileFormIO(request.POST, request.FILES)
-    files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
-    if fileio.is_valid():
-        for f in files:
-            # Insert into db
-            dbio.create_file('FACheck_upload', 'FACheck_seq', check_seq, f.name, path, uploader, upload_time, f_type)
-            # Save file
-            path = os.path.join(path, check_seq)
-            fileio.save(f, path)
+        upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+        path = os.path.join(BASE_DIR, 'check')
+        check_seq = dbio.get_seq('FACheck', site=site, category=category,
+                                 sample_category=sample_category, sample_pid=sample_pid)
 
-    return path
+        # Handle files
+        fileio = FileFormIO(request.POST, request.FILES)
+        files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
+        if fileio.is_valid():
+            finish = []
+            for f in files:
+                # Insert into db
+                dbio.create_file('FACheck_upload', 'FACheck_seq', check_seq,
+                                 f.name, path, uploader, upload_time, type_dict[f_type])
+                # Save file
+                path = os.path.join(path, check_seq)
+                fileio.save(f, path)
+
+                finish.append(f.name)
+
+        result = {
+            'message': 'File %s uploaded successfully.' % ', '.join(finish)
+        }
+
+    else:
+        result = {
+            'message': 'Type not existed.'
+        }
+
+    return result

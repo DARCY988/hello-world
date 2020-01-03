@@ -16,7 +16,7 @@ import os
 # -------------------- #
 # DataBase CRUD API
 # -------------------- #
-@api_view(['post'])
+@fii_api_handler(['post'])
 def api_file_io(request, debug, api_version, module):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
