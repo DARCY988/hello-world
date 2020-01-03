@@ -1,7 +1,7 @@
 from django.urls import include, re_path
 from . import views
 from .ecn import ecn_views
-from .datacenter import datacenter_views
+from .datacenter import dc_views
 
 
 app_name = 'ecom'
@@ -25,15 +25,15 @@ urlpatterns = [
                     r'^data_center/',
                     include(
                         [
-                            re_path(r'select_category_by_site/', datacenter_views.api_checking_status_by_category),
-                            re_path(r'select_site_by_category/', datacenter_views.api_checking_status_by_site),
-                            re_path(r'get_all_data/', datacenter_views.api_get_all_data),
-                            re_path(r'upload/', datacenter_views.dc_upload),
-                            re_path(r'upload_excel/', datacenter_views.upload_excel),
-                            re_path(r'get_path/', datacenter_views.get_path_by_cert),
-                            re_path(r'delete/', datacenter_views.delete_by_path),
-                            re_path(r'preview/', datacenter_views.preview_by_path),
-                            re_path(r'download/', datacenter_views.download_by_path),
+                            re_path(r'select_category_by_site/', dc_views.api_checking_status_by_category),
+                            re_path(r'select_site_by_category/', dc_views.api_checking_status_by_site),
+                            re_path(r'get_all_data/', dc_views.api_get_all_data),
+                            re_path(r'upload/', dc_views.dc_upload),
+                            re_path(r'upload_excel/', dc_views.upload_excel),
+                            re_path(r'get_path/', dc_views.get_path_by_cert),
+                            re_path(r'delete/', dc_views.delete_by_path),
+                            re_path(r'preview/', dc_views.preview_by_path),
+                            re_path(r'download/', dc_views.download_by_path),
                         ]
                     )
                 )
