@@ -3,6 +3,7 @@ from datetime import datetime, timezone, timedelta
 from fii_ai_api.settings import STATIC_ROOT
 from ecom.config import __CATEGORIES__, __LOCATIONS__
 from .fileio import FileFormIO
+from .notify import MailCenter
 import os
 
 

@@ -1,7 +1,5 @@
 from fii_ai_api.utils.response import fii_api_handler
-from fii_ai_api.settings import STATIC_ROOT
 from .dbio import ECNMySQLIO
-from .notify import MailCenter
 from .models import (
     info_upload, report_upload, check_upload
 )

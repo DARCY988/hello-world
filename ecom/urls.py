@@ -2,6 +2,7 @@ from django.urls import include, re_path
 from . import views
 from .ecn import ecn_views
 from .datacenter import datacenter_views
+from .audit import audit_views
 
 
 app_name = 'ecom'
@@ -27,9 +28,6 @@ urlpatterns = [
                     include(
                         [
                             re_path(r'category/(?P<site>\w+)*', ecn_views.category_cert_view),
-                            re_path(r'site/(?P<category>\w+)*', ecn_views.site_cert_view),
-                            re_path(r'all/', ecn_views.all_cert_view),
-                            # re_path(r'files/preview/(?P<file_name>.*\..+)', ecn_views.file_preview),
                         ]
                     )
                 ),
@@ -69,10 +67,10 @@ urlpatterns = [
                     )
                 ),
                 re_path(
-                    r'^ecn/',  # Add Factory Audit module here.
+                    r'^audit/',  # Add Factory Audit module here.
                     include(
                         [
-                            re_path(r'files/(?P<module>\w+)*/', ecn_views.api_file_io),
+                            re_path(r'files/(?P<module>\w+)*/', audit_views.api_file_io),
                         ]
                     )
                 ),
