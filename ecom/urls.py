@@ -1,7 +1,7 @@
 from django.urls import include, re_path
 from . import views
 from .ecn import ecn_views
-from .dataCenter import DataCenter_views
+from .datacenter import datacenter_views
 
 
 app_name = 'ecom'
@@ -37,9 +37,15 @@ urlpatterns = [
                     r'^data_center/',
                     include(
                         [
-                            re_path(r'select_category_by_site/', DataCenter_views.api_checking_status_by_category),
-                            re_path(r'select_site_by_category/', DataCenter_views.api_checking_status_by_site),
-                            re_path(r'get_all_data/', DataCenter_views.api_get_all_data),
+                            re_path(r'select_category_by_site/', datacenter_views.api_checking_status_by_category),
+                            re_path(r'select_site_by_category/', datacenter_views.api_checking_status_by_site),
+                            re_path(r'get_all_data/', datacenter_views.api_get_all_data),
+                            re_path(r'upload/', datacenter_views.dc_upload),
+                            #  re_path(r'excel_upload/', datacenter_views.get_excel),
+                            re_path(r'get_path/', datacenter_views.get_path_by_cert),
+                            re_path(r'delete/', datacenter_views.delete_by_path),
+                            re_path(r'preview/', datacenter_views.preview_by_path),
+                            re_path(r'download/', datacenter_views.download_by_path),
                         ]
                     )
                 )
