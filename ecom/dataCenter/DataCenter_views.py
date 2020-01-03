@@ -9,6 +9,7 @@ from fii_ai_api.settings import STATIC_ROOT
 import pandas as pd
 from pandas import DataFrame, read_excel
 from fii_ai_api.utils.files import FileHandler
+import datetime
 
 # Build path in this module like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = STATIC_ROOT
@@ -95,3 +96,36 @@ def download_by_path(request, debug, api_version  # these three parameters alway
     result = db.download_files(request.POST.get('path'))
 
     return result
+
+
+@fii_api_handler(['post'])
+def upload_excel(request, debug, api_version  # these three parameters always place at index 0:2
+                 ):  # Add your parameters here
+
+    data = request.FILES['file']
+    datacente_df = pd.read_excel(data, sheet_name='Data Center')
+    result_list = []
+    for i in range(len(datacente_df)):
+        sql_dict = {}
+        sql_dict['site'] = datacente_df.iloc[i][0]
+        sql_dict['category'] = datacente_df.iloc[i][1]
+        sql_dict['cert_no'] = datacente_df.iloc[i][2]
+        sql_dict['applicant'] = datacente_df.iloc[i][3]
+        sql_dict['pid'] = datacente_df.iloc[i][4]
+        sql_dict['issue_date'] = datacente_df.iloc[i][5]
+        sql_dict['exp_date'] = datacente_df.iloc[i][6]
+        sql_dict['status'] = datacente_df.iloc[i][7]
+        sql_dict['upload'] = 'null'
+        sql_dict['create_time'] = datetime.datetime.now()
+        try:
+            result = db.insert_datacenter(sql_dict)
+            if result:
+                result = 'upload row %d success' % i
+            else:
+                result = 'upload row %d fail, Duplicate entry pid' % i
+            result_list.append(result)
+        except Exception:
+            result = 'upload row %i error' % i
+            result_list.append(result)
+
+    return result_list

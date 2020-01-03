@@ -29,7 +29,7 @@ urlpatterns = [
                             re_path(r'select_site_by_category/', datacenter_views.api_checking_status_by_site),
                             re_path(r'get_all_data/', datacenter_views.api_get_all_data),
                             re_path(r'upload/', datacenter_views.dc_upload),
-                            #  re_path(r'excel_upload/', datacenter_views.get_excel),
+                            re_path(r'upload_excel/', datacenter_views.upload_excel),
                             re_path(r'get_path/', datacenter_views.get_path_by_cert),
                             re_path(r'delete/', datacenter_views.delete_by_path),
                             re_path(r'preview/', datacenter_views.preview_by_path),

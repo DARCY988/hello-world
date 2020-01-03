@@ -136,3 +136,30 @@ class DataCenterMySQLIO(MySQL):
         result = FileHandler.download(self=self, path=temp_path[0], file_name=temp_path[1])
 
         return result
+
+    def insert_datacenter(self, sql_dict):                                # 考慮將路徑改為timestamp or UUID
+        create_time = datetime.datetime.now()                            # 取得上傳時間
+        exp_date = datetime.datetime.strptime(str(sql_dict['exp_date']), '%Y-%m-%d %H:%M:%S') #格式化時間
+        issue_date = datetime.datetime.strptime(str(sql_dict['issue_date']), '%Y-%m-%d %H:%M:%S') #格式化時間
+        cert_no = str(sql_dict['cert_no']).replace(" ", "") #格式化證書號碼 刪除空白
+        if sql_dict['status'] == 'Suspended':   # 將狀態改為int格式寫入數據庫
+            status = 0
+        else:
+            status = 1
+
+        sql = '''
+        INSERT INTO %(DataCenter_table)s(site, category, cert_no, applicant, pid,
+        issue_date, exp_date, status, upload, create_time)
+        VALUES ('%(site)s', '%(category)s', '%(cert_no)s, '%(applicant)s', '%(pid)s',
+        '%(issue_date)s', '%(exp_date)s', %(status)s, '%(upload)s', '%(create_time)s')
+        ''' % (
+            {'DataCenter_table' : self.db_tables['DataCenter'], 'site' : sql_dict['site'],
+             'category' : sql_dict['category'], 'cert_no' : cert_no,
+             'applicant' : sql_dict['applicant'], 'pid' : sql_dict['pid'], 'issue_date' : issue_date,
+             'exp_date' : exp_date, 'status' : status, 'upload' : sql_dict['upload'],
+             'create_time' : create_time
+             }
+        )
+        result = self.manipulate_db(sql, dtype='list')                                  # 將檔案資訊寫入資料庫
+
+        return result
