@@ -22,22 +22,22 @@ def info_upload(request, dbio, uploader):
     if fileio.is_valid():
         for f in files:
             # Insert into db
-            seq = dbio.create_file('FAInfo_upload', 'site', site, f.name, path, uploader, upload_time)
+            dbio.create_file('FAInfo_upload', 'site', site, f.name, path, uploader, upload_time)
             # Save file
-            path = os.path.join(path, str(seq))
+            path = os.path.join(path, site)
             fileio.save(f, path)
 
     return path
 
 
 def report_upload(request, dbio, uploader):
-    target = {
-        'site': request.POST.get('site'),
-        'category': request.POST.get('category'),
-    }
+    # Keys to get seq
+    site = request.POST.get('site')
+    category = request.POST.get('category')
+
     upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
     path = os.path.join(BASE_DIR, 'report')
-    report_seq = dbio.get_seq('FAReport', target)
+    report_seq = dbio.get_seq('FAReport', site=site, category=category)
     f_type = request.POST.get('type')
 
     # Handle files
@@ -46,25 +46,26 @@ def report_upload(request, dbio, uploader):
     if fileio.is_valid():
         for f in files:
             # Insert into db
-            seq = dbio.create_file('FAReport_upload', 'FAReport_seq', report_seq,
-                                   f.name, path, uploader, upload_time, f_type)
+            dbio.create_file('FAReport_upload', 'FAReport_seq', report_seq, f.name, path, uploader, upload_time, f_type)
             # Save file
-            path = os.path.join(path, str(seq))
+            path = os.path.join(path, report_seq)
             fileio.save(f, path)
 
     return path
 
 
 def check_upload(request, dbio, uploader):
-    target = {
-        'site': request.POST.get('site'),
-        'category': request.POST.get('category'),
-        'sample_category': request.POST.get('sample_category'),
-        'sample_pid': request.POST.get('sample_pid'),
-    }
+    # Keys to get seq
+    site = request.POST.get('site')
+    category = request.POST.get('category')
+    sample_category = request.POST.get('sample_category')
+    sample_pid = request.POST.get('sample_pid')
+
     upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
     path = os.path.join(BASE_DIR, 'check')
-    check_seq = dbio.get_seq('FACheck', target)
+    check_seq = dbio.get_seq('FACheck', site=site, category=category,
+                             sample_category=sample_category, sample_pid=sample_pid)
+    f_type = request.POST.get('type')
 
     # Handle files
     fileio = FileFormIO(request.POST, request.FILES)
@@ -72,9 +73,9 @@ def check_upload(request, dbio, uploader):
     if fileio.is_valid():
         for f in files:
             # Insert into db
-            seq = dbio.create_file('FACheck_upload', 'FACheck_seq', check_seq, f.name, path, uploader, upload_time)
+            dbio.create_file('FACheck_upload', 'FACheck_seq', check_seq, f.name, path, uploader, upload_time, f_type)
             # Save file
-            path = os.path.join(path, str(seq))
+            path = os.path.join(path, check_seq)
             fileio.save(f, path)
 
     return path

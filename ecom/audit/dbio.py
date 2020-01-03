@@ -18,11 +18,11 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql)
 
-    def get_seq(self, table, conditions):
+    def get_seq(self, table, **kwargs):
         sql = '''
         SELECT seq FROM `%(table)s` WHERE %(conditions)s
         ''' % (
             {'table': self.db_tables[table],
-             'conditions': ' and '.join('%s="%s"' % (k, v) for (k, v) in conditions.items())}
+             'conditions': ' and '.join('%s="%s"' % (k, v) for (k, v) in kwargs.items())}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
