@@ -21,13 +21,13 @@ def api_file_io(request, debug, api_version, module):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    modules = {
-        'info': info_upload(request, db, request.POST.get('user')),
-        'report': report_upload(request, db, request.POST.get('user')),
-        'check': check_upload(request, db, request.POST.get('user')),
-    }
-
-    if request.method == 'POST' and module in modules.keys():
-        result = modules[module]
+    if request.method == 'POST':
+        modules = {
+            'info': info_upload(request, db, request.POST.get('user')),
+            'report': report_upload(request, db, request.POST.get('user')),
+            'check': check_upload(request, db, request.POST.get('user')),
+        }
+        if module in modules.keys():
+            result = modules[module]
 
     return result

@@ -70,7 +70,7 @@ urlpatterns = [
                     r'^audit/',  # Add Factory Audit module here.
                     include(
                         [
-                            re_path(r'files/(?P<module>\w+)*/', audit_views.api_file_io),
+                            re_path(r'files/(?P<module>\w+)*', audit_views.api_file_io),
                         ]
                     )
                 ),

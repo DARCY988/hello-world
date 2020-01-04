@@ -2,7 +2,7 @@
 __CONTRIBUTORS__ = ['BonJu', 'Leo']
 
 # API version
-__API_VERSION__ = ['latest', 'v2.0']
+__API_VERSION__ = ['latest', 'v2.2']
 
 
 # -------------------- #
@@ -39,7 +39,18 @@ MYSQL_product_table = {
     'ECN_CCL': 'ECN_CCL',
     'ECN_model': 'ECN_model',
     'DataCenter' : 'DataCenter',
-    'DC_upload' : 'DC_upload'
+    'DC_upload' : 'DC_upload',
+    'FACheck' : 'FACheck',
+    'FACheck_upload' : 'FACheck_upload',
+    'FAInfo_upload' : 'FAInfo_upload',
+    'FAReport' : 'FAReport',
+    'FAReport_upload' : 'FAReport_upload',
+    'ODM' : 'ODM',
+    'ODM_upload' : 'ODM_upload',
+    'PVTComp' : 'PVTComp',
+    'PVTComp_upload' : 'PVTComp_upload',
+    'PVTGoods' : 'PVTGoods',
+    'PVTGoods_upload' : 'PVTGoods_upload',
 }
 
 AGILE_product_table = {
@@ -53,7 +64,18 @@ MYSQL_test_table = {
     'ECN_CCL': 'ECN_CCL_copy1',
     'ECN_model': 'ECN_model_copy1',
     'DataCenter' : 'DataCenter_test',
-    'DC_upload' : 'DC_upload'
+    'DC_upload' : 'DC_upload',
+    'FACheck' : 'FACheck_copy1',
+    'FACheck_upload' : 'FACheck_upload_copy1',
+    'FAInfo_upload' : 'FAInfo_upload_copy1',
+    'FAReport' : 'FAReport_copy1',
+    'FAReport_upload' : 'FAReport_upload_copy1',
+    'ODM' : 'ODM_copy1',
+    'ODM_upload' : 'ODM_upload_copy1',
+    'PVTComp' : 'PVTComp_copy1',
+    'PVTComp_upload' : 'PVTComp_upload_copy1',
+    'PVTGoods' : 'PVTGoods_copy1',
+    'PVTGoods_upload' : 'PVTGoods_upload_copy1',
 }
 
 AGILE_test_table = {

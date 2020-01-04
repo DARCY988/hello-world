@@ -8,7 +8,7 @@ import os
 
 
 # Build path in this module like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.join(STATIC_ROOT, 'audit')
+BASE_DIR = os.path.join(os.path.join(STATIC_ROOT, 'ecom'), 'audit')
 
 
 def info_upload(request, dbio, uploader):
@@ -24,7 +24,7 @@ def info_upload(request, dbio, uploader):
 
     if f_type in type_dict.keys():  # Check whether file_type is in formatted list.
         upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-        path = os.path.join(BASE_DIR, 'info')
+        mod_path = os.path.join(BASE_DIR, 'info')
         site = request.POST.get('site')
 
         # Handle files
@@ -33,16 +33,16 @@ def info_upload(request, dbio, uploader):
         if fileio.is_valid():
             finish = []
             for f in files:
+                # Save file
+                path = os.path.join(mod_path, site)
+                fileio.save(f, path)
                 # Insert into db
                 dbio.create_file('FAInfo_upload', 'site', site, f.name, path, uploader, upload_time, type_dict[f_type])
-                # Save file
-                path = os.path.join(path, site)
-                fileio.save(f, path)
 
                 finish.append(f.name)
 
         result = {
-            'message': 'File %s uploaded successfully.' % ', '.join(finish)
+            'message': 'File "%s" uploaded successfully.' % ', '.join(finish)
         }
 
     else:
@@ -66,7 +66,7 @@ def report_upload(request, dbio, uploader):
         category = request.POST.get('category')
 
         upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-        path = os.path.join(BASE_DIR, 'report')
+        mod_path = os.path.join(BASE_DIR, 'report')
         report_seq = dbio.get_seq('FAReport', site=site, category=category)
 
         # Handle files
@@ -75,17 +75,17 @@ def report_upload(request, dbio, uploader):
         if fileio.is_valid():
             finish = []
             for f in files:
+                # Save file
+                path = os.path.join(mod_path, report_seq)
+                fileio.save(f, path)
                 # Insert into db
                 dbio.create_file('FAReport_upload', 'FAReport_seq', report_seq,
                                  f.name, path, uploader, upload_time, type_dict[f_type])
-                # Save file
-                path = os.path.join(path, report_seq)
-                fileio.save(f, path)
 
                 finish.append(f.name)
 
         result = {
-            'message': 'File %s uploaded successfully.' % ', '.join(finish)
+            'message': 'File "%s" uploaded successfully.' % ', '.join(finish)
         }
 
     else:
@@ -117,7 +117,7 @@ def check_upload(request, dbio, uploader):
         sample_pid = request.POST.get('sample_pid')
 
         upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-        path = os.path.join(BASE_DIR, 'check')
+        mod_path = os.path.join(BASE_DIR, 'check')
         check_seq = dbio.get_seq('FACheck', site=site, category=category,
                                  sample_category=sample_category, sample_pid=sample_pid)
 
@@ -127,17 +127,17 @@ def check_upload(request, dbio, uploader):
         if fileio.is_valid():
             finish = []
             for f in files:
+                # Save file
+                path = os.path.join(mod_path, check_seq)
+                fileio.save(f, path)
                 # Insert into db
                 dbio.create_file('FACheck_upload', 'FACheck_seq', check_seq,
                                  f.name, path, uploader, upload_time, type_dict[f_type])
-                # Save file
-                path = os.path.join(path, check_seq)
-                fileio.save(f, path)
 
                 finish.append(f.name)
 
         result = {
-            'message': 'File %s uploaded successfully.' % ', '.join(finish)
+            'message': 'File "%s" uploaded successfully.' % ', '.join(finish)
         }
 
     else:

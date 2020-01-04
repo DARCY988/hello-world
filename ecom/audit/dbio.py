@@ -9,7 +9,7 @@ class ECNMySQLIO(MySQL):
 
     def create_file(self, table, key, value, name, path, uploader, upload_time, f_type):
         sql = '''
-        INSERT INTO `%(table)s` ('%(key)s', name, path, upload, upload_time, type)
+        INSERT INTO `%(table)s` (%(key)s, name, path, upload, upload_time, type)
         VALUES ('%(value)s', '%(name)s', '%(path)s', '%(uploader)s', '%(time)s', '%(type)s')
         ''' % (
             {'table': self.db_tables[table], 'key': key, 'value': value,

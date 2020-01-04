@@ -34,7 +34,7 @@ class FileHandler(forms.Form):
             File saving status.
         '''
         if not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path)
 
         try:
             with open(os.path.join(path, file.name), 'wb+') as destination:
