@@ -181,7 +181,7 @@ def list_all_ecn(agile_dbio, ecn_dbio, site):   # TODO: Make sure database table
             result.append(
                 {
                     'Site': filtered_site,
-                    'ECN No.': ecn_no,
+                    'ECN No': ecn_no,
                     'Certificate No': cert_no,
                     'PID': pid,
                     'Component Name': component,
