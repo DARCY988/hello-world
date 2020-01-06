@@ -11,11 +11,9 @@ import os
 BASE_DIR = os.path.join(os.path.join(STATIC_ROOT, 'ecom'), 'audit')
 
 
-# def save_to_db(dbio, module)
-
-
-def info_upload(request, dbio, uploader):
+def info_upload(request, dbio):
     f_type = request.POST.get('file_type')
+    uploader = request.POST.get('user')
     type_dict = {
         'ISO9001 Certificate': 1,
         'Business License': 2,
@@ -56,8 +54,9 @@ def info_upload(request, dbio, uploader):
     return result
 
 
-def report_upload(request, dbio, uploader):
+def report_upload(request, dbio):
     f_type = request.POST.get('file_type')
+    uploader = request.POST.get('user')
     type_dict = {
         'Audit Report/Self-inspection Report': 1,
         'CAR': 2,
@@ -99,8 +98,9 @@ def report_upload(request, dbio, uploader):
     return result
 
 
-def check_upload(request, dbio, uploader):
+def check_upload(request, dbio):
     f_type = request.POST.get('file_type')
+    uploader = request.POST.get('user')
     type_dict = {
         'Validation Report': 1,
         'PMP': 2,

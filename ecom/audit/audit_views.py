@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, timezone
 # -------------------- #
 # AI Model Results API
 # -------------------- #
-@fii_api_handler(['get', 'delete'])
+@api_view(['get', 'delete'])
 def info_view(request, debug, api_version):  # Create method is include in upload method.
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
@@ -27,7 +27,7 @@ def info_view(request, debug, api_version):  # Create method is include in uploa
     return result
 
 
-@fii_api_handler(['get', 'post', 'put', 'delete'])
+@api_view(['get', 'post', 'put', 'delete'])
 def report_view(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
@@ -101,10 +101,14 @@ def report_view(request, debug, api_version):
     return result
 
 
-@fii_api_handler(['get', 'post', 'put', 'delete'])
+@api_view(['get', 'post', 'put', 'delete'])
 def check_view(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
+
+    conform_status = {
+        'OK': 1,
+    }
 
     # List all report
     if request.method == 'GET':
@@ -123,11 +127,8 @@ def check_view(request, debug, api_version):
         sample_category = request.POST.get('sample_category')
         sample_pid = request.POST.get('sample_pid')
         sample_applicant = request.POST.get('sample_applicant')
-
         sample_conform = request.POST.get('sample_conform')
-        conform_status = {
-            'OK': 1,
-        }
+
         if sample_conform in conform_status.keys():
             sample_conform = conform_status[sample_conform]
 
@@ -152,11 +153,8 @@ def check_view(request, debug, api_version):
         # Edit items
         new_date = request.POST.get('new_audit_date')
         new_applicant = request.POST.get('new_applicant')
-
         new_conform = request.POST.get('new_conform')
-        conform_status = {
-            'OK': 1,
-        }
+
         if new_conform in conform_status.keys():
             new_conform = conform_status[new_conform]
 
@@ -177,22 +175,20 @@ def check_view(request, debug, api_version):
 # -------------------- #
 # DataBase CRUD API
 # -------------------- #
-@fii_api_handler(['post'])
+@api_view(['post'])
 def api_file_io(request, debug, api_version, module):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    if request.method == 'POST':
+    mod_list = ['info', 'report', 'check']
+
+    if request.method == 'POST' and module in mod_list:
         modules = {
-            'info': info_upload(request, db, request.POST.get('user')),
-            'report': report_upload(request, db, request.POST.get('user')),
-            'check': check_upload(request, db, request.POST.get('user')),
+            'info': info_upload(request, db),
+            'report': report_upload(request, db),
+            'check': check_upload(request, db),
         }
         if module in modules.keys():
             result = modules[module]
-
-        # modules = {
-        #     'info': 'FAInfo'
-        # }
 
     return result
