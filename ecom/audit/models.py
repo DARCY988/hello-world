@@ -11,6 +11,9 @@ import os
 BASE_DIR = os.path.join(os.path.join(STATIC_ROOT, 'ecom'), 'audit')
 
 
+# def save_to_db(dbio, module)
+
+
 def info_upload(request, dbio, uploader):
     f_type = request.POST.get('file_type')
     type_dict = {
