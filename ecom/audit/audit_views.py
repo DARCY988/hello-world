@@ -11,8 +11,8 @@ from datetime import datetime, timedelta, timezone
 # -------------------- #
 # AI Model Results API
 # -------------------- #
-@fii_api_handler(['get'])
-def info_view(request, debug, api_version):
+@fii_api_handler(['get', 'delete'])
+def info_view(request, debug, api_version):  # Create method is include in upload method.
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
@@ -21,10 +21,13 @@ def info_view(request, debug, api_version):
         site = request.GET.get('site', None)
         result = db.read_info(site)
 
+    if request.method == 'DELETE':
+        result = {}
+
     return result
 
 
-@fii_api_handler(['get', 'post'])
+@fii_api_handler(['get', 'post', 'put', 'delete'])
 def report_view(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
@@ -35,6 +38,7 @@ def report_view(request, debug, api_version):
         category = request.GET.get('category', None)
         result = db.read_report(site, category)
 
+    # Add new record
     if request.method == 'POST':
         # Get data
         site = request.POST.get('site')
@@ -63,10 +67,41 @@ def report_view(request, debug, api_version):
             'message': 'Create report successfully.'
         }
 
+    # Edit report
+    if request.method == 'PUT':
+        # Keys
+        site = request.POST.get('site')
+        category = request.POST.get('category')
+
+        # Edit items
+        new_class = request.POST.get('new_class')
+        new_date = request.POST.get('new_audit_date')
+
+        new_result = request.POST.get('new_result')
+        result_dict = {
+            'Pass A': 1,
+            'Pass B': 2,
+            'Pass C': 3,
+            'Fail': 4,
+        }
+        if new_result in result_dict.keys():
+            new_result = result_dict[new_result]
+
+        new_nexttime = datetime.strptime(new_date, '%Y/%m/%d').date() + timedelta(days=365)  # 1 year for 'CCC'
+        uploader = request.POST.get('uploader')
+        update_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+
+        # Update db
+        db.update_report(site, category, new_class, new_date, new_result, new_nexttime, uploader, update_time)
+
+        result = {
+            'message': 'Update report successfully.'
+        }
+
     return result
 
 
-@fii_api_handler(['get', 'post'])
+@fii_api_handler(['get', 'post', 'put', 'delete'])
 def check_view(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
@@ -79,6 +114,7 @@ def check_view(request, debug, api_version):
         sample_pid = request.GET.get('sample_pid', None)
         result = db.read_check(site, category, sample_category, sample_pid)
 
+    # Add new record
     if request.method == 'POST':
         # Get data
         site = request.POST.get('site')
@@ -104,6 +140,35 @@ def check_view(request, debug, api_version):
 
         result = {
             'message': 'Create check successfully.'
+        }
+
+    if request.method == 'PUT':
+        # Keys
+        site = request.POST.get('site')
+        category = request.POST.get('category')
+        sample_category = request.POST.get('sample_category')
+        sample_pid = request.POST.get('sample_pid')
+
+        # Edit items
+        new_date = request.POST.get('new_audit_date')
+        new_applicant = request.POST.get('new_applicant')
+
+        new_conform = request.POST.get('new_conform')
+        conform_status = {
+            'OK': 1,
+        }
+        if new_conform in conform_status.keys():
+            new_conform = conform_status[new_conform]
+
+        uploader = request.POST.get('uploader')
+        update_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+
+        # Update db
+        db.update_check(site, category, sample_category, sample_pid, new_date, new_applicant, new_conform,
+                        uploader, update_time)
+
+        result = {
+            'message': 'Update check successfully.'
         }
 
     return result
