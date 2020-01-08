@@ -49,6 +49,16 @@ urlpatterns = [
                             re_path(r'download/', dc_views.download_by_path),
                         ]
                     )
+                ),
+                re_path(
+                    r'^pvt/',
+                    include(
+                        [
+                            re_path(r'(?P<page>\w+)/select_category/', pvt_views.api_checking_status_by_category),
+                            re_path(r'(?P<page>\w+)/select_site/', pvt_views.api_checking_status_by_site),
+                            re_path(r'(?P<page>\w+)/get_all_data/', pvt_views.api_get_all_data),
+                        ]
+                    )
                 )
                 # Add your api path here,
                 # Example. re_path(r'^<custom url path>/', views.<function>),

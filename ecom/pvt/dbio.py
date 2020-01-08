@@ -6,12 +6,13 @@ import datetime
 import os
 
 
-class DataCenterMySQLIO(MySQL):
+class PVTMySQLIO(MySQL):
     def __init__(self, debug=False, db_tables={}, custom_login_info={}, **kwargs):
         super().__init__(debug=debug, db_tables=db_tables, login_info=MYSQL_login_info, **kwargs)
 
     def get_all_data(self, **kwargs):
         #  將kwargs 寫入變數
+        
         try:
             select_site = ' WHERE ' + 'site' + ' = ' + '\'' + kwargs['select_site'] + '\''
         except Exception:
@@ -23,16 +24,27 @@ class DataCenterMySQLIO(MySQL):
 
         if select_site and select_category :
             select_category = ' AND ' + 'category' + ' = ' + '\'' + kwargs['select_category'] + '\''
+        # PVT下有兩個分頁 需連到不同資料庫與取得不同欄位
+        if kwargs['page'] == 'goods':  # goods分頁 需連到不同資料庫與取得不同欄位
 
-        get_column = 'site, category, cert_no, applicant, pid, issue_date, exp_date, status, upload, update_time'
-        #  get_column 要顯示的欄位
+            table = 'PVTGoods'
+            get_column = '''
+            site, category, cert_no, pid, type, pvt_date, report_no,
+            test_result, nexttime, upload, create_time, update_time
+            '''
+        else:                           # comps分頁 需連到不同資料庫與取得不同欄位
+            table = 'PVTComp'
+            get_column = '''
+            site, category, compname, manufacturer, model, pn, report_no, pvtdate,
+            test_result, nexttime, upload, create_time, upload_time
+            '''
 
         sql = '''
         SELECT %(get_column)s
-        FROM %(DataCenter_table)s
+        FROM %(PVT_table)s
         %(select_site)s %(select_category)s
         ''' % (
-            {'DataCenter_table' : self.db_tables['DataCenter'], 'get_column' : get_column,
+            {'PVT_table' : self.db_tables[table], 'get_column' : get_column,
              'select_category' : select_category, 'select_site' : select_site
              }
         )
@@ -43,9 +55,14 @@ class DataCenterMySQLIO(MySQL):
         #  傳入必要參數column及可附加條件kwargs計算數量
         #  EX column = site ,  value = FOL
         #  EX column = category ,  value = CCC
-        #  應該可以改寫迴圈
+        #  應該可以改寫為迴圈
+        if kwargs['page'] == 'goods':
+            table = 'PVTGoods'
+        else:
+            table = 'PVTComp'
+
         try:
-            status_value = ' AND ' + 'status' + ' = ' + '\'' + kwargs['status_value'] + '\''
+            status_value = ' AND ' + 'test_result' + ' = ' + '\'' + kwargs['status_value'] + '\''
         except Exception:
             status_value = ''
         try:
@@ -59,10 +76,10 @@ class DataCenterMySQLIO(MySQL):
         #  改寫為迴圈
         sql = '''
         SELECT COUNT(%(column)s)
-        FROM %(DataCenter_table)s
+        FROM %(PVT_table)s
         WHERE  %(column)s = '%(value)s' %(status_value)s %(select_site)s %(select_category)s
         ''' % (
-            {'DataCenter_table' : self.db_tables['DataCenter'], 'column' : column,
+            {'PVT_table' : self.db_tables[table], 'column' : column,
              'value' : value , 'status_value' : status_value, 'select_category' : select_category,
              'select_site' : select_site
              }
