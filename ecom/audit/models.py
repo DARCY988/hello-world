@@ -1,5 +1,6 @@
 from pandas import DataFrame
 from datetime import datetime, timezone, timedelta
+from rest_framework.response import Response
 from fii_ai_api.settings import STATIC_ROOT
 from ecom.config import __CATEGORIES__, __LOCATIONS__
 from .fileio import FileFormIO
@@ -11,97 +12,21 @@ import os
 BASE_DIR = os.path.join(os.path.join(STATIC_ROOT, 'ecom'), 'audit')
 
 
-def info_upload(request, dbio):
+def upload_files(request, dbio, module):
+    site = request.POST.get('site')
     f_type = request.POST.get('file_type')
-    uploader = request.POST.get('user')
-    type_dict = {
+    file_types = {
+        # Info
         'ISO9001 Certificate': 1,
         'Business License': 2,
         'ODM/OEM Agreement': 3,
         'Factory Introduction': 4,
         'Company Org': 5,
         'CNAS Certificate': 6,
-    }
-
-    if f_type in type_dict.keys():  # Check whether file_type is in formatted list.
-        upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-        mod_path = os.path.join(BASE_DIR, 'info')
-        site = request.POST.get('site')
-
-        # Handle files
-        fileio = FileFormIO(request.POST, request.FILES)
-        files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
-        if fileio.is_valid():
-            finish = []
-            for f in files:
-                # Save file
-                path = os.path.join(mod_path, site)
-                fileio.save(f, path)
-                # Insert into db
-                dbio.create_file('FAInfo_upload', 'site', site, f.name, path, uploader, upload_time, type_dict[f_type])
-
-                finish.append(f.name)
-
-        result = {
-            'message': 'File "%s" uploaded successfully.' % ', '.join(finish)
-        }
-
-    else:
-        result = {
-            'message': 'Type not existed.'
-        }
-
-    return result
-
-
-def report_upload(request, dbio):
-    f_type = request.POST.get('file_type')
-    uploader = request.POST.get('user')
-    type_dict = {
+        # Report
         'Audit Report/Self-inspection Report': 1,
         'CAR': 2,
-    }
-
-    if f_type in type_dict.keys():  # Check whether file_type is in formatted list.
-        # Keys to get seq
-        site = request.POST.get('site')
-        category = request.POST.get('category')
-
-        upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-        mod_path = os.path.join(BASE_DIR, 'report')
-        report_seq = dbio.get_seq('FAReport', site=site, category=category)
-
-        # Handle files
-        fileio = FileFormIO(request.POST, request.FILES)
-        files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
-        if fileio.is_valid():
-            finish = []
-            for f in files:
-                # Save file
-                path = os.path.join(mod_path, report_seq)
-                fileio.save(f, path)
-                # Insert into db
-                dbio.create_file('FAReport_upload', 'FAReport_seq', report_seq,
-                                 f.name, path, uploader, upload_time, type_dict[f_type])
-
-                finish.append(f.name)
-
-        result = {
-            'message': 'File "%s" uploaded successfully.' % ', '.join(finish)
-        }
-
-    else:
-        result = {
-            'message': 'Type not existed.'
-        }
-
-    return result
-
-
-def check_upload(request, dbio):
-    f_type = request.POST.get('file_type')
-    uploader = request.POST.get('user')
-    type_dict = {
+        # Check
         'Validation Report': 1,
         'PMP': 2,
         'SOP': 3,
@@ -111,41 +36,110 @@ def check_upload(request, dbio):
         'Internal Audit Report': 7,
         'Other': 8,
     }
+    if module == 'info':
+        table = 'FAInfo_upload'
+        key = 'site'
+        value = site
 
-    if f_type in type_dict.keys():  # Check whether file_type is in formatted list.
-        # Keys to get seq
-        site = request.POST.get('site')
+    elif module == 'report':
         category = request.POST.get('category')
-        sample_category = request.POST.get('sample_category')
-        sample_pid = request.POST.get('sample_pid')
+        table = 'FAReport_upload'
+        key = 'FAReport_seq'
+        value = dbio.get_seq('FAReport', site=site, category=category).iloc[0]['seq']
 
+    elif module == 'check':
+        category = request.POST.get('category')
+        s_category = request.POST.get('sample_category')
+        s_pid = request.POST.get('sample_pid')
+        table = 'FACheck_upload'
+        key = 'FACheck_seq'
+        value = dbio.get_seq('FACheck', site=site, category=category,
+                             sample_category=s_category, sample_pid=s_pid).iloc[0]['seq']
+
+    if f_type in file_types:  # Check whether file_type is in formatted list.
+        uploader = request.POST.get('uploader')
         upload_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-        mod_path = os.path.join(BASE_DIR, 'check')
-        check_seq = dbio.get_seq('FACheck', site=site, category=category,
-                                 sample_category=sample_category, sample_pid=sample_pid)
+        mod_path = os.path.join(BASE_DIR, module)  # first level directory
 
         # Handle files
         fileio = FileFormIO(request.POST, request.FILES)
         files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
         if fileio.is_valid():
-            finish = []
+            status = {}
             for f in files:
                 # Save file
-                path = os.path.join(mod_path, check_seq)
-                fileio.save(f, path)
-                # Insert into db
-                dbio.create_file('FACheck_upload', 'FACheck_seq', check_seq,
-                                 f.name, path, uploader, upload_time, type_dict[f_type])
+                try:
+                    timestamp = str(datetime.now(timezone(timedelta(hours=8))).timestamp()).replace('.', '')
+                    path = os.path.join(mod_path, timestamp)  # Use timestamp to generate file path
+                    fileio.save(f, path)
+                    # Insert into db
+                    dbio.create_file(table, key, value, f.name, path, uploader, upload_time, file_types[f_type])
 
-                finish.append(f.name)
+                    status[f.name] = 'Upload successfully.'
+                except Exception as e:
+                    status[f.name] = 'Error: %s' % e.__str__()
 
         result = {
-            'message': 'File "%s" uploaded successfully.' % ', '.join(finish)
+            'message': status
         }
 
     else:
         result = {
             'message': 'Type not existed.'
         }
+
+    return Response(result)
+
+
+def list_files(request, dbio, module):
+    site = request.POST.get('site')
+    if module == 'info':
+        table = 'FAInfo_upload'
+        key = 'site'
+        value = site
+
+    elif module == 'report':
+        category = request.POST.get('category')
+        table = 'FAReport_upload'
+        key = 'FAReport_seq'
+        value = dbio.get_seq('FAReport', site=site, category=category).iloc[0]['seq']
+
+    elif module == 'check':
+        category = request.POST.get('category')
+        s_category = request.POST.get('sample_category')
+        s_pid = request.POST.get('sample_pid')
+        table = 'FACheck_upload'
+        key = 'FACheck_seq'
+        value = dbio.get_seq('FACheck', site=site, category=category,
+                             sample_category=s_category, sample_pid=s_pid).iloc[0]['seq']
+
+    data = dbio.get_files(table, key, value)
+
+    result = []
+    for row in range(0, len(data.index)):
+        result.append(
+            {
+                'name': data.iloc[row][1],
+                'path': data.iloc[row][2],
+                'type': data.iloc[row][3],
+                'upload_time': str(data.iloc[row][4]),
+                'uploader': data.iloc[row][5],
+            }
+        )
+
+    return Response(result)
+
+
+def delete_files(dbio, module, name, path):
+    tables = {
+        'info': 'FAInfo_upload',
+        'report': 'FAReport_upload',
+        'check': 'FACheck_upload',
+    }
+    # Delete db record
+    dbio.delete_file(tables[module], name, path)
+    # Delete file
+    fileio = FileFormIO()
+    result = fileio.delete(path, name)
 
     return result

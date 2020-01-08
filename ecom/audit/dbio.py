@@ -16,6 +16,15 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
+    def get_files(self, table, key, value):
+        sql = '''
+        SELECT %(key)s, name, path, type, upload_time, upload FROM `%(table)s`
+        WHERE %(key)s="%(value)s"
+        ''' % (
+            {'table': self.db_tables[table], 'key': key, 'value': value}
+        )
+        return self.manipulate_db(sql, dtype='DataFrame')
+
     def create_file(self, table, key, value, name, path, uploader, upload_time, f_type):  # Create info is included
         sql = '''
         INSERT INTO `%(table)s` (%(key)s, name, path, upload, upload_time, type)
@@ -136,5 +145,13 @@ class ECNMySQLIO(MySQL):
                 'update_uploader': 'upload="%s",' % uploader if uploader else '',
                 'update_time': 'update_time="%s"' % update_time if update_time else '',
             }
+        )
+        return self.manipulate_db(sql)
+
+    def delete_file(self, table, name, path):
+        sql = '''
+        DELETE FROM `%(table)s` WHERE name="%(name)s" and path="%(path)s"
+        ''' % (
+            {'table': self.db_tables[table], 'name': name, 'path': path}
         )
         return self.manipulate_db(sql)

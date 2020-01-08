@@ -1,7 +1,7 @@
 from fii_ai_api.utils.response import fii_api_handler
 from .dbio import ECNMySQLIO
 from .models import (
-    info_upload, report_upload, check_upload
+    upload_files, list_files, delete_files
 )
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -24,7 +24,7 @@ def info_view(request, debug, api_version):  # Create method is include in uploa
     if request.method == 'DELETE':
         result = {}
 
-    return result
+    return Response(result)
 
 
 @api_view(['get', 'post', 'put', 'delete'])
@@ -98,7 +98,7 @@ def report_view(request, debug, api_version):
             'message': 'Update report successfully.'
         }
 
-    return result
+    return Response(result)
 
 
 @api_view(['get', 'post', 'put', 'delete'])
@@ -169,26 +169,30 @@ def check_view(request, debug, api_version):
             'message': 'Update check successfully.'
         }
 
-    return result
+    return Response(result)
 
 
 # -------------------- #
 # DataBase CRUD API
 # -------------------- #
-@api_view(['post'])
+@api_view(['get', 'post', 'delete'])
 def api_file_io(request, debug, api_version, module):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
     mod_list = ['info', 'report', 'check']
 
-    if request.method == 'POST' and module in mod_list:
-        modules = {
-            'info': info_upload(request, db),
-            'report': report_upload(request, db),
-            'check': check_upload(request, db),
-        }
-        if module in modules.keys():
-            result = modules[module]
+    if module in mod_list:
+        if request.method == 'GET':
+            result = list_files(request, db, module)
+
+        if request.method == 'POST':
+            result = upload_files(request, db, module)
+
+        if request.method == 'DELETE':
+            name = request.POST.get('name')
+            path = request.POST.get('path')
+
+            result = delete_files(db, module, name, path)
 
     return result
