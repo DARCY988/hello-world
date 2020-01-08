@@ -1,7 +1,7 @@
 from fii_ai_api.utils.response import fii_api_handler
 from .dbio import ECNMySQLIO
 from .models import (
-    upload_files, list_files, delete_files
+    upload_files, list_files, delete_files, count_by_category, count_by_site
 )
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -11,6 +11,28 @@ from datetime import datetime, timedelta, timezone
 # -------------------- #
 # AI Model Results API
 # -------------------- #
+# ----- Module 1 ----- #
+@api_view(['get'])
+def category_cert_view(request, debug, api_version, site=None):
+
+    db = ECNMySQLIO(debug=debug, api_version=api_version)
+    # mail = MailCenter(debug=debug, api_version=api_version)
+
+    result = count_by_category(db, site)
+
+    return Response(result)
+# ----- Module 2 ----- #
+@api_view(['get'])
+def site_cert_view(request, debug, api_version, category):
+
+    db = ECNMySQLIO(debug=debug, api_version=api_version)
+    # mail = MailCenter(debug=debug, api_version=api_version)
+
+    result = count_by_site(db, category)
+
+    return Response(result)
+# ----- Module 3 ----- #
+# ----- Module 4 ----- #
 @api_view(['get', 'delete'])
 def info_view(request, debug, api_version):  # Create method is include in upload method.
 

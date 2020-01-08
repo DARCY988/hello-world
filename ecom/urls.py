@@ -27,6 +27,11 @@ urlpatterns = [
                     r'^audit/',  # Add Factory Audit module here.
                     include(
                         [
+                            # ----- Module 1 ----- #
+                            re_path(r'category/(?P<site>\w+)*', audit_views.category_cert_view),
+                            # ----- Module 2 ----- #
+                            re_path(r'site/(?P<category>\w+)*', audit_views.site_cert_view),
+                            # ----- Module 4 ----- #
                             re_path(r'info/', audit_views.info_view),
                             re_path(r'report/', audit_views.report_view),
                             re_path(r'check/', audit_views.check_view),
@@ -72,6 +77,7 @@ urlpatterns = [
                     r'^audit/',  # Add Factory Audit module here.
                     include(
                         [
+                            # ----- Files IO ----- #
                             re_path(r'files/(?P<module>\w+)*', audit_views.api_file_io),
                         ]
                     )

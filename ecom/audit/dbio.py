@@ -25,6 +25,19 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
+    def report_amount(self, target, key=None, value=None):
+        sql = '''
+        SELECT `%(target)s`, COUNT(%(target)s) as 'amount', MAX(audit_result) as 'status'
+        FROM `%(report)s`
+        %(condition)s
+        GROUP BY `%(target)s`
+        ORDER BY amount DESC
+        ''' % (
+            {'target': target, 'report': self.db_tables['FAReport'],
+             'condition': 'WHERE %s = "%s"' % (key, value) if (key and value) else ''}
+        )
+        return self.manipulate_db(sql, dtype='DataFrame')
+
     def create_file(self, table, key, value, name, path, uploader, upload_time, f_type):  # Create info is included
         sql = '''
         INSERT INTO `%(table)s` (%(key)s, name, path, upload, upload_time, type)

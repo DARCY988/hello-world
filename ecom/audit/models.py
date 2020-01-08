@@ -12,6 +12,84 @@ import os
 BASE_DIR = os.path.join(os.path.join(STATIC_ROOT, 'ecom'), 'audit')
 
 
+# ---- Module 1/3 ---- #
+def count_by_category(dbio, site):
+    categories = __CATEGORIES__.copy()
+    data = dbio.report_amount('category', 'site' if site else None, site)
+
+    # alarm = MailCenter()
+
+    result = {}
+    for row in range(0, len(data.index)):
+        category = data.iloc[row]['category']
+        amount = data.iloc[row]['amount']
+        # Pass A: 1, Pass B: 2, Pass C: 3, Fail: 4
+        status = data.iloc[row]['status']
+
+        # Pass A: 1, Pass B&C: 2, Fail: 3
+        if status > 2:
+            status -= 1
+            # if status == 3:
+            #     alarm.send_fii_alarm(subject='Factory Audit Alarm!', message='')
+
+        result[category] = {'value': amount, 'status': status}
+
+        # Remove none-zero category from list
+        if category in categories:
+            categories.remove(category)
+
+    for empty in categories:
+        result[empty] = {'value': 0, 'status': 1}
+
+    return result
+
+
+# ----- Module 2 ----- #
+def count_by_site(dbio, category):
+    locations = __LOCATIONS__.copy()
+    data = dbio.report_amount('site', 'category' if category else None, category)
+
+    result = []
+    for row in range(0, len(data.index)):
+        site = data.iloc[row]['site']
+        amount = data.iloc[row]['amount']
+        # Pass A: 1, Pass B: 2, Pass C: 3, Fail: 4
+        status = data.iloc[row]['status']
+
+        # Pass A: 1, Pass B&C: 2, Fail: 3
+        if status > 2:
+            status -= 1
+            # if status == 3:
+            #     alarm.send_fii_alarm(subject='Factory Audit Alarm!', message='')
+
+        result.append(
+            {
+                'name': site,
+                'coord': locations[site],
+                'value': amount,
+                'status': status
+            }
+        )
+
+        # Remove none-zero site from dictionary
+        if site in locations:
+            del locations[site]
+
+    for empty in locations:
+        result.append(
+            {
+                'name': empty,
+                'coord': locations[empty],
+                'value': 0,
+                'status': 1
+            }
+        )
+
+    return result
+
+
+# ----- Module 4 ----- #
+# ----- Files IO ----- #
 def upload_files(request, dbio, module):
     site = request.POST.get('site')
     f_type = request.POST.get('file_type')
