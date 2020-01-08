@@ -2,11 +2,8 @@ from django.urls import include, re_path
 from . import views
 from .ecn import ecn_views
 from .datacenter import dc_views
-<<<<<<< HEAD
 from .pvt import pvt_views
-=======
 from .audit import audit_views
->>>>>>> master
 
 
 app_name = 'ecom'
