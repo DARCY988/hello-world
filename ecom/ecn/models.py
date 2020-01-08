@@ -1,20 +1,11 @@
 from pandas import DataFrame
 from datetime import datetime, timezone, timedelta
+from ecom.config import __CATEGORIES__, __LOCATIONS__
 
 
 # Cert Tab
 def count_by_category(dbio, site):
-    categories = [
-        'CCC',
-        'CSA',
-        'ETL',
-        'IECEx',
-        'MET',
-        'Nemko',
-        'TUV',
-        'UL',
-    ]
-
+    categories = __CATEGORIES__.copy()
     data = dbio.cert_amount('category', 'site' if site else None, site)
 
     # TODO: Check Agile system and get the status
@@ -36,14 +27,7 @@ def count_by_category(dbio, site):
 
 
 def count_by_site(dbio, category):
-    locations = {
-        "FCZ": [15.2120232, 49.9493036],
-        "FOC": [115.0491412, 27.7198832],
-        "FOL": [113.899891, 18.6764474],
-        "FTX": [-94.0602476, 44.8204983],
-        "FJZ": [-106.543702, 31.6859596],
-    }
-
+    locations = __LOCATIONS__.copy()
     data = dbio.cert_amount('site', 'category' if category else None, category)
 
     # TODO: Check Agile system and get the status
@@ -79,7 +63,7 @@ def count_by_site(dbio, category):
 
 
 def list_all_cert(dbio, category, site):
-    data = dbio.read_ecn_info(category, site)
+    data = dbio.read_cert_info(category, site)
 
     # TODO: Check Agile system and get the status
 
@@ -89,32 +73,92 @@ def list_all_cert(dbio, category, site):
             {
                 'Site': data.iloc[row]['site'],
                 'Category': data.iloc[row]['category'],
-                'Certificate No.': data.iloc[row]['cert_no'],
-                'Product PID': data.iloc[row]['pid'],
+                'Certificate No': data.iloc[row]['cert_no'],
+                'PID': data.iloc[row]['pid'],
                 'CCL': data.iloc[row]['CCL'],
                 'CCL Supplier': data.iloc[row]['supplier'],
                 'CCL Model': data.iloc[row]['model'],
-                'CCL Spec.': data.iloc[row]['spec'],
-                'CCL PN': data.iloc[row]['PN'],
-                # 'CCL Model compare': data.iloc[row]['model_compare'],
-                # 'CCL PN compare': data.iloc[row]['PN_compare'],
+                'Spec': data.iloc[row]['spec'],
+                'PN': data.iloc[row]['PN'],
+                'Uploader': data.iloc[row]['upload'],
+                'Upload Time': data.iloc[row]['create_time'],
             }
         )
 
     return result
 
 
-def edit_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, spec, PN, updater, update_time,
+def add_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, spec, PN, uploader):
+    create_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+
+    # Avoid duplicated
+    if not dbio.check_duplicated(dbio.db_tables['ECN'], 'cert_no', cert_no):
+        dbio.create_ECN(site, category, cert_no, pid, uploader, create_time)
+
+    if not dbio.check_duplicated(dbio.db_tables['ECN_CCL'], 'PN', PN):
+        dbio.create_CCL(CCL, PN)
+
+    if not dbio.check_duplicated(dbio.db_tables['ECN_model'], 'cert_no', cert_no, 'pn', PN, 'model', model):
+        dbio.create_model(supplier, model, spec, PN, cert_no)
+
+    result = {
+        'Site': site,
+        'Category': category,
+        'Certificate No': cert_no,
+        'PID': pid,
+        'CCL': CCL,
+        'CCL Supplier': supplier,
+        'CCL Model': model,
+        'Spec': spec,
+        'PN': PN,
+        'Uploader': uploader,
+        'Upload Time': create_time,
+    }
+
+    return result
+
+
+def edit_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, spec, PN, updater,
                     new_PN=None, new_supplier=None, new_model=None, new_spec=None):
-    result = dbio.update_cert_info(site, category, cert_no, pid, CCL, supplier, model, spec, PN, updater, update_time,
-                                   new_PN, new_supplier, new_model, new_spec)
+    update = new_PN or new_model or new_supplier or new_spec
+    if update:
+        update_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+
+        dbio.update_cert_info(site, category, cert_no, pid, CCL, supplier, model, spec, PN,
+                              updater, update_time, new_PN, new_supplier, new_model, new_spec)
+        result = {
+            'Site': site,
+            'Category': category,
+            'Certificate No': cert_no,
+            'Product PID': pid,
+            'CCL': CCL,
+            'CCL Supplier': new_supplier if new_supplier else supplier,
+            'CCL Model': new_model if new_model else model,
+            'Spec': new_spec if new_spec else spec,
+            'PN': new_PN if new_PN else PN,
+            'Uploader': updater,
+            'Upload time': update_time,
+        }
+
+    return result
+
+
+def delete_cert_table(dbio, site, category, cert_no, pid, CCL, supplier, model, spec, PN):
+    dbio.delete_ECN(site, category, cert_no, pid)
+    dbio.delete_CCL(CCL, PN)
+    dbio.delete_model(supplier, model, spec, PN, cert_no)
+
+    result = {
+        'message': 'Data deleted.'
+    }
+
     return result
 
 
 # Agile Tab
 def list_all_ecn(agile_dbio, ecn_dbio, site):   # TODO: Make sure database table is correct.
     agile_df = agile_dbio.read_agile_info(site)
-    cert_df = ecn_dbio.read_ecn_info(site)
+    cert_df = ecn_dbio.read_cert_info(site)
 
     result = []
     for agile_row in range(0, len(agile_df.index)):
@@ -137,8 +181,8 @@ def list_all_ecn(agile_dbio, ecn_dbio, site):   # TODO: Make sure database table
             result.append(
                 {
                     'Site': filtered_site,
-                    'ECN No.': ecn_no,
-                    'Certificate No.': cert_no,
+                    'ECN No': ecn_no,
+                    'Certificate No': cert_no,
                     'PID': pid,
                     'Component Name': component,
                     'Model': model,

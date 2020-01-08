@@ -2,7 +2,11 @@ from django.urls import include, re_path
 from . import views
 from .ecn import ecn_views
 from .datacenter import dc_views
+<<<<<<< HEAD
 from .pvt import pvt_views
+=======
+from .audit import audit_views
+>>>>>>> master
 
 
 app_name = 'ecom'
@@ -19,6 +23,17 @@ urlpatterns = [
                             re_path(r'category/(?P<site>\w+)*', ecn_views.category_cert_view),
                             re_path(r'site/(?P<category>\w+)*', ecn_views.site_cert_view),
                             re_path(r'all/', ecn_views.all_cert_view),
+                            # re_path(r'files/preview/(?P<file_name>.*\..+)', ecn_views.file_preview),
+                        ]
+                    )
+                ),
+                re_path(
+                    r'^audit/',  # Add Factory Audit module here.
+                    include(
+                        [
+                            re_path(r'info/', audit_views.info_view),
+                            re_path(r'report/', audit_views.report_view),
+                            re_path(r'check/', audit_views.check_view),
                         ]
                     )
                 ),
@@ -63,10 +78,15 @@ urlpatterns = [
                         [
                             re_path(r'info/', ecn_views.api_ecn_read),
                             re_path(r'count/(?P<key>\w+)*', ecn_views.api_cert_count),
-                            re_path(r'upload/', ecn_views.api_file_upload),
-                            re_path(r'download/(?P<file_name>.*\..+)', ecn_views.api_file_download),
-                            re_path(r'preview/(?P<file_name>.*\..+)', ecn_views.api_file_preview),
-                            re_path(r'delete/(?P<file_name>.*\..+)', ecn_views.api_file_delete),
+                            re_path(r'files/', ecn_views.api_file_io),
+                        ]
+                    )
+                ),
+                re_path(
+                    r'^audit/',  # Add Factory Audit module here.
+                    include(
+                        [
+                            re_path(r'files/(?P<module>\w+)*', audit_views.api_file_io),
                         ]
                     )
                 ),

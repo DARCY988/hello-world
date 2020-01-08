@@ -3,7 +3,8 @@ from .dbio import ECNMySQLIO, AgileMySQLIO
 from .notify import MailCenter
 from .fileio import FileFormIO
 from .models import (
-    count_by_category, count_by_site, list_all_cert, list_all_ecn
+    count_by_category, count_by_site, list_all_cert, add_cert_table, edit_cert_table, delete_cert_table,
+    list_all_ecn
 )
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -38,17 +39,80 @@ def site_cert_view(request, debug, api_version, category):
     return Response(result)
 
 
-@api_view(['get'])
+@api_view(['get', 'put', 'post', 'delete'])
 def all_cert_view(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    category = request.GET.get('category', None)
-    site = request.GET.get('site', None)
+    # Get database table
+    if request.method == 'GET':
+        category = request.GET.get('category', None)
+        site = request.GET.get('site', None)
 
-    result = list_all_cert(db, category, site)
+        result = list_all_cert(db, category, site)
+
+    # Add table data
+    elif request.method == 'POST':
+        site = request.POST.get('site')
+        category = request.POST.get('category')
+        cert_no = request.POST.get('cert_no')
+        pid = request.POST.get('pid')
+        ccl = request.POST.get('ccl')
+        supplier = request.POST.get('supplier')
+        model = request.POST.get('model')
+        spec = request.POST.get('spec')
+        pn = request.POST.get('pn')
+        uploader = request.POST.get('uploader')
+
+        result = add_cert_table(db, site, category, cert_no, pid, ccl, supplier, model, spec, pn, uploader)
+
+    # Edit table data
+    elif request.method == 'PUT':
+        site = request.POST.get('site')
+        category = request.POST.get('category')
+        cert_no = request.POST.get('cert_no')
+        pid = request.POST.get('pid')
+        ccl = request.POST.get('ccl')
+        supplier = request.POST.get('supplier')
+        model = request.POST.get('model')
+        spec = request.POST.get('spec')
+        pn = request.POST.get('pn')
+        updater = request.POST.get('uploader')
+        new_pn = request.POST.get('new_pn', None)
+        new_supplier = request.POST.get('new_supplier', None)
+        new_model = request.POST.get('new_model', None)
+        new_spec = request.POST.get('new_spec', None)
+
+        result = edit_cert_table(db, site, category, cert_no, pid, ccl, supplier, model, spec, pn, updater,
+                                 new_pn, new_supplier, new_model, new_spec)
+
+    # Delete table data
+    elif request.method == 'DELETE':
+        site = request.POST.get('site')
+        category = request.POST.get('category')
+        cert_no = request.POST.get('cert_no')
+        pid = request.POST.get('pid')
+        ccl = request.POST.get('ccl')
+        supplier = request.POST.get('supplier')
+        model = request.POST.get('model')
+        spec = request.POST.get('spec')
+        pn = request.POST.get('pn')
+
+        result = delete_cert_table(db, site, category, cert_no, pid, ccl, supplier, model, spec, pn)
 
     return Response(result)
+
+
+# @api_view(['get'])
+# def file_preview(request, debug, api_version, file_name):
+
+#     path = os.path.join(BASE_DIR, 'doc')
+
+#     # Do preview method.
+#     fileio = FileFormIO()
+#     result = fileio.preview(path, file_name)
+
+#     return result
 
 
 # Agile Tab
@@ -70,7 +134,7 @@ def api_ecn_read(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    return db.read_ecn_info()
+    return db.read_cert_info()
 
 
 @fii_api_handler(['get'])
@@ -82,58 +146,22 @@ def api_cert_count(request, debug, api_version, key):
 
 
 @api_view(['post'])
-def api_file_upload(request, debug, api_version):
+def api_file_io(request, debug, api_version):
 
     db = ECNMySQLIO(debug=debug, api_version=api_version)
 
-    # path = os.path.join(BASE_DIR, 'doc')
-    # status = {}
     if request.method == 'POST':
         fileio = FileFormIO(request.POST, request.FILES)
         files = request.FILES.getlist('file_field')  # getlist() attribute name must be tha same as the front-form
         if fileio.is_valid():
             for f in files:
-                # Save file
-                # status[f.name] = {
-                #     'status': fileio.save(f, path)
-                # }
                 # Read file and save to db
                 result = fileio.read_ecn(f, db, request.POST.get('user'))
 
-    return Response(result)
+    # elif request.method == 'GET':
+    #     result = fileio.download(path, file_name)
 
-
-@api_view(['get'])
-def api_file_download(request, debug, api_version, file_name):
-
-    path = os.path.join(BASE_DIR, 'doc')
-    if request.method == 'GET':
-        # Do download method.
-        fileio = FileFormIO()
-        result = fileio.download(path, file_name)
-
-    return result
-
-
-@api_view(['get'])
-def api_file_preview(request, debug, api_version, file_name):
-
-    path = os.path.join(BASE_DIR, 'doc')
-    if request.method == 'GET':
-        # Do preview method.
-        fileio = FileFormIO()
-        result = fileio.preview(path, file_name)
-
-    return result
-
-
-@api_view(['delete'])
-def api_file_delete(request, debug, api_version, file_name):
-
-    path = os.path.join(BASE_DIR, 'doc')
-    if request.method == 'DELETE':
-        # Do delete method.
-        fileio = FileFormIO()
-        result = fileio.delete(path, file_name)
+    # elif request.method == 'DELETE':
+    #     result = fileio.delete(path, file_name)
 
     return result

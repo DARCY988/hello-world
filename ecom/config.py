@@ -2,7 +2,32 @@
 __CONTRIBUTORS__ = ['BonJu', 'Leo']
 
 # API version
-__API_VERSION__ = ['latest', 'v2.0']
+__API_VERSION__ = ['latest', 'v2.2']
+
+
+# -------------------- #
+# Common Information
+# -------------------- #
+# Category list
+__CATEGORIES__ = [
+    'CCC',
+    'CSA',
+    'ETL',
+    'IECEx',
+    'MET',
+    'Nemko',
+    'TUV',
+    'UL',
+]
+
+# Site list
+__LOCATIONS__ = {
+    "FCZ": [15.2120232, 49.9493036],
+    "FOC": [115.0491412, 27.7198832],
+    "FOL": [113.899891, 18.6764474],
+    "FTX": [-94.0602476, 44.8204983],
+    "FJZ": [-106.543702, 31.6859596],
+}
 
 
 # -------------------- #
@@ -15,10 +40,24 @@ MYSQL_product_table = {
     'ECN_model': 'ECN_model',
     'DataCenter' : 'DataCenter',
     'DC_upload' : 'DC_upload',
+<<<<<<< HEAD
     'PVTGoods' : 'PVTGoods',
     'PVTGoods_upload' : 'PVTGoods_upload',
     'PVTComp' : 'PVTComp',
     'PVTComp_upload' : 'PVTComp_upload'
+=======
+    'FACheck' : 'FACheck',
+    'FACheck_upload' : 'FACheck_upload',
+    'FAInfo_upload' : 'FAInfo_upload',
+    'FAReport' : 'FAReport',
+    'FAReport_upload' : 'FAReport_upload',
+    'ODM' : 'ODM',
+    'ODM_upload' : 'ODM_upload',
+    'PVTComp' : 'PVTComp',
+    'PVTComp_upload' : 'PVTComp_upload',
+    'PVTGoods' : 'PVTGoods',
+    'PVTGoods_upload' : 'PVTGoods_upload',
+>>>>>>> master
 }
 
 AGILE_product_table = {
@@ -33,10 +72,24 @@ MYSQL_test_table = {
     'ECN_model': 'ECN_model_copy1',
     'DataCenter' : 'DataCenter_test',
     'DC_upload' : 'DC_upload',
+<<<<<<< HEAD
     'PVTGoods' : 'PVTGoods',
     'PVTGoods_upload' : 'PVTGoods_upload',
     'PVTComp' : 'PVTComp',
     'PVTComp_upload' : 'PVTComp_upload',
+=======
+    'FACheck' : 'FACheck_copy1',
+    'FACheck_upload' : 'FACheck_upload_copy1',
+    'FAInfo_upload' : 'FAInfo_upload_copy1',
+    'FAReport' : 'FAReport_copy1',
+    'FAReport_upload' : 'FAReport_upload_copy1',
+    'ODM' : 'ODM_copy1',
+    'ODM_upload' : 'ODM_upload_copy1',
+    'PVTComp' : 'PVTComp_copy1',
+    'PVTComp_upload' : 'PVTComp_upload_copy1',
+    'PVTGoods' : 'PVTGoods_copy1',
+    'PVTGoods_upload' : 'PVTGoods_upload_copy1',
+>>>>>>> master
 }
 
 AGILE_test_table = {
@@ -90,7 +143,10 @@ MYSQL_login_info = {
 }
 
 
-# Mail settings
+# -------------------- #
+# Mail Information
+# -------------------- #
+# Production settings
 MAIL_product_setting = {
     'use_ssl': True,
     'use_tls': False,
@@ -104,6 +160,7 @@ MAIL_product_setting = {
     ],
 }
 
+# Test settings
 MAIL_test_setting = {
     'use_ssl': True,
     'use_tls': False,
