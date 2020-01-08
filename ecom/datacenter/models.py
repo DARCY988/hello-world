@@ -13,9 +13,9 @@ def checking_expire(**kwargs):  # EX: category = ccc or site = FOC
         diff_day = row['exp_date'] - time_now  # 到期時間減去現在時間
         if diff_day.days >= 120:               # >120天為正常 狀態0
             status = 0
-        if diff_day.days < 120:              # <120 要預警 呈現橘色 狀態1
+        elif diff_day.days < 120:              # <120 要預警 呈現橘色 狀態1
             status = 1
-        if diff_day.days < 30:               # <30 每天預警 呈現紅色 狀態2
+        elif diff_day.days < 30:               # <30 每天預警 呈現紅色 狀態2
             status = 2
 
         # 將取出的資料與日期比對結果寫入result
