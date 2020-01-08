@@ -7,16 +7,6 @@ class ECNMySQLIO(MySQL):
     def __init__(self, debug=False, db_tables={}, custom_login_info={}, **kwargs):
         super().__init__(debug=debug, db_tables=db_tables, login_info=MYSQL_login_info, **kwargs)
 
-    def create_file(self, table, key, value, name, path, uploader, upload_time, f_type):
-        sql = '''
-        INSERT INTO `%(table)s` (%(key)s, name, path, upload, upload_time, type)
-        VALUES ('%(value)s', '%(name)s', '%(path)s', '%(uploader)s', '%(time)s', %(type)s)
-        ''' % (
-            {'table': self.db_tables[table], 'key': key, 'value': value,
-             'name': name, 'path': path, 'uploader': uploader, 'time': upload_time, 'type': f_type}
-        )
-        return self.manipulate_db(sql)
-
     def get_seq(self, table, **kwargs):
         sql = '''
         SELECT seq FROM `%(table)s` WHERE %(conditions)s
@@ -25,6 +15,38 @@ class ECNMySQLIO(MySQL):
              'conditions': ' and '.join('%s="%s"' % (k, v) for (k, v) in kwargs.items())}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
+
+    def get_files(self, table, key, value):
+        sql = '''
+        SELECT %(key)s, name, path, type, upload_time, upload FROM `%(table)s`
+        WHERE %(key)s="%(value)s"
+        ''' % (
+            {'table': self.db_tables[table], 'key': key, 'value': value}
+        )
+        return self.manipulate_db(sql, dtype='DataFrame')
+
+    def report_amount(self, target, key=None, value=None):
+        sql = '''
+        SELECT `%(target)s`, COUNT(%(target)s) as 'amount', MAX(audit_result) as 'status'
+        FROM `%(report)s`
+        %(condition)s
+        GROUP BY `%(target)s`
+        ORDER BY amount DESC
+        ''' % (
+            {'target': target, 'report': self.db_tables['FAReport'],
+             'condition': 'WHERE %s = "%s"' % (key, value) if (key and value) else ''}
+        )
+        return self.manipulate_db(sql, dtype='DataFrame')
+
+    def create_file(self, table, key, value, name, path, uploader, upload_time, f_type):  # Create info is included
+        sql = '''
+        INSERT INTO `%(table)s` (%(key)s, name, path, upload, upload_time, type)
+        VALUES ('%(value)s', '%(name)s', '%(path)s', '%(uploader)s', '%(time)s', %(type)s)
+        ''' % (
+            {'table': self.db_tables[table], 'key': key, 'value': value,
+             'name': name, 'path': path, 'uploader': uploader, 'time': upload_time, 'type': f_type}
+        )
+        return self.manipulate_db(sql)
 
     def create_report(self, site, category, r_class, audit_date,
                       audit_result, next_time, uploader, create_time):
@@ -99,3 +121,50 @@ class ECNMySQLIO(MySQL):
                 if (site or category or sample_category or sample_pid) else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
+
+    def update_report(self, site, category, new_class=None, new_date=None, new_result=None,
+                      new_nexttime=None, uploader=None, update_time=None):
+        sql = '''
+        UPDATE `%(table)s`
+        SET %(update_class)s %(update_date)s %(update_result)s %(update_nexttime)s %(update_uploader)s %(update_time)s
+        WHERE site='%(site)s' and category='%(category)s'
+        ''' % (
+            {
+                'table': self.db_tables['FAReport'], 'site': site, 'category': category,
+                'update_class': 'class="%s",' % new_class if new_class else '',
+                'update_date': 'audit_date="%s",' % new_date if new_date else '',
+                'update_result': 'audit_result="%s",' % new_result if new_result else '',
+                'update_nexttime': 'nextaudittime="%s",' % new_nexttime if new_nexttime else '',
+                'update_uploader': 'upload="%s",' % uploader if uploader else '',
+                'update_time': 'update_time="%s"' % update_time if update_time else '',
+            }
+        )
+        return self.manipulate_db(sql)
+
+    def update_check(self, site, category, sample_category, sample_pid, new_date=None,
+                     new_applicant=None, new_conform=None, uploader=None, update_time=None):
+        sql = '''
+        UPDATE `%(table)s`
+        SET %(update_date)s %(update_applicant)s %(update_conform)s %(update_uploader)s %(update_time)s
+        WHERE site='%(site)s' and category='%(category)s' and sample_category='%(sample_category)s' and
+        sample_pid='%(sample_pid)s'
+        ''' % (
+            {
+                'table': self.db_tables['FACheck'],
+                'site': site, 'category': category, 'sample_category': sample_category, 'sample_pid': sample_pid,
+                'update_date': 'audit_date="%s",' % new_date if new_date else '',
+                'update_applicant': 'sample_applicant="%s",' % new_applicant if new_applicant else '',
+                'update_conform': 'sample_conform=%s,' % new_conform if new_conform else '',
+                'update_uploader': 'upload="%s",' % uploader if uploader else '',
+                'update_time': 'update_time="%s"' % update_time if update_time else '',
+            }
+        )
+        return self.manipulate_db(sql)
+
+    def delete_file(self, table, name, path):
+        sql = '''
+        DELETE FROM `%(table)s` WHERE name="%(name)s" and path="%(path)s"
+        ''' % (
+            {'table': self.db_tables[table], 'name': name, 'path': path}
+        )
+        return self.manipulate_db(sql)

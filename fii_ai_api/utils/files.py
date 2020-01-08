@@ -175,19 +175,25 @@ class FileHandler(forms.Form):
         result: Response
             Delete message response.
         '''
-        target = os.path.join(path, file_name)
-        if os.path.exists(target):
-            os.remove(target)
+        if os.path.isdir(path):
+            target = os.path.join(path, file_name)
+            if os.path.exists(target):
+                os.remove(target)
 
-            result = {
-                'message': 'File \'%s\' has been deleted.' % (file_name)
-            }
+                result = {
+                    'message': 'File \'%s\' has been deleted.' % (file_name)
+                }
+            else:
+                result = {
+                    'message': 'File \'%s\' not found.' % (file_name)
+                }
+
+            if not os.listdir(path):
+                os.rmdir(path)
+
         else:
             result = {
-                'message': 'File \'%s\' not found.' % (file_name)
+                'message': 'Check the path \'%s\' is correct or not.' % (path)
             }
-
-        if not os.listdir(path):
-            os.removedirs(path)
 
         return Response(result)
