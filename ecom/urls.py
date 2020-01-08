@@ -2,6 +2,7 @@ from django.urls import include, re_path
 from . import views
 from .ecn import ecn_views
 from .datacenter import dc_views
+from .pvt import pvt_views
 
 
 app_name = 'ecom'
@@ -34,6 +35,16 @@ urlpatterns = [
                             re_path(r'delete/', dc_views.delete_by_path),
                             re_path(r'preview/', dc_views.preview_by_path),
                             re_path(r'download/', dc_views.download_by_path),
+                        ]
+                    )
+                ),
+                re_path(
+                    r'^pvt/',
+                    include(
+                        [
+                            re_path(r'(?P<page>\w+)/select_category/', pvt_views.api_checking_status_by_category),
+                            re_path(r'(?P<page>\w+)/select_site/', pvt_views.api_checking_status_by_site),
+                            re_path(r'(?P<page>\w+)/get_all_data/', pvt_views.api_get_all_data),
                         ]
                     )
                 )

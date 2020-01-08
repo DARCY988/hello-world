@@ -14,7 +14,11 @@ MYSQL_product_table = {
     'ECN_CCL': 'ECN_CCL',
     'ECN_model': 'ECN_model',
     'DataCenter' : 'DataCenter',
-    'DC_upload' : 'DC_upload'
+    'DC_upload' : 'DC_upload',
+    'PVTGoods' : 'PVTGoods',
+    'PVTGoods_upload' : 'PVTGoods_upload',
+    'PVTComp' : 'PVTComp',
+    'PVTComp_upload' : 'PVTComp_upload'
 }
 
 AGILE_product_table = {
@@ -28,7 +32,11 @@ MYSQL_test_table = {
     'ECN_CCL': 'ECN_CCL_copy1',
     'ECN_model': 'ECN_model_copy1',
     'DataCenter' : 'DataCenter_test',
-    'DC_upload' : 'DC_upload'
+    'DC_upload' : 'DC_upload',
+    'PVTGoods' : 'PVTGoods',
+    'PVTGoods_upload' : 'PVTGoods_upload',
+    'PVTComp' : 'PVTComp',
+    'PVTComp_upload' : 'PVTComp_upload',
 }
 
 AGILE_test_table = {
@@ -70,16 +78,16 @@ AGILE_login_info = {
 # }
 
 
-# #  leolee loacl MySQL login accout and password
-# MYSQL_login_info = {
-#     'username': 'root',
-#     'password': '55665566',
-#     'hostname': '127.0.0.1',
-#     'port': 3306,
-#     'db_name': 'test',
-#     'prod_table': MYSQL_product_table,
-#     'test_table': MYSQL_test_table
-# }
+#  leolee loacl MySQL login accout and password
+MYSQL_login_info = {
+    'username': 'root',
+    'password': '55665566',
+    'hostname': '127.0.0.1',
+    'port': 3306,
+    'db_name': 'test',
+    'prod_table': MYSQL_product_table,
+    'test_table': MYSQL_test_table
+}
 
 
 # Mail settings
