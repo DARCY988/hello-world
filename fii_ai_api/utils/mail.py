@@ -2,6 +2,8 @@
 Mail service class.
 """
 from django.core.mail import get_connection, EmailMultiAlternatives, EmailMessage
+from email.mime.text import MIMEText
+from smtplib import SMTP, SMTPException
 import os
 import inspect
 import importlib
@@ -28,6 +30,63 @@ class BasicMail(object):
             fail_silently=False,
             **kwargs
         )
+
+    def send_fii_mail(self, subject, message, from_mail, recipient_list):
+        ''' Send foxconn mail
+        Parameters
+        --------------
+        subject: str
+            Mail title. It is important for mail server to recognize whether this mail is spam or not.
+
+        message: str
+            Mail body message.
+
+        from_mail: str
+            The sender name and email shown to the recipients.
+            Example:
+            ```
+            'Name <no-reply@example.com>'
+            ```
+
+        recipient_list: list
+            A list of strings, each an email address. Each member of recipient_list
+            will see the other recipients in the “To:” field of the email message.
+            Example:
+            ```
+            ['123@example.com', '456@example.com', ...]
+            ```
+        Return
+        --------------
+        result: str
+            Email sending result.
+        '''
+        # Mail connection info
+        host = '10.134.34.241'
+        port = 587
+        ehlo = 'ismetoad'  # IMPORTANT: This is how we get authentication
+
+        message = MIMEText(message, 'plain', 'utf-8')
+        message['Subject'] = subject
+        message['From'] = from_mail or self.from_email
+        message['To'] = ', '.join(recipient_list or self.recipient_list)
+
+        try:
+            smtp = SMTP(host, port)
+            # Authenticate
+            smtp.ehlo(ehlo)
+            smtp.starttls()
+            smtp.helo(ehlo)
+            # Set the debug output level
+            smtp.set_debuglevel(0)
+            # Send mail
+            smtp.sendmail(from_mail, recipient_list, message.as_string())
+            # Close connection
+            smtp.quit()
+            result = 'Alarm has been sent.'
+        except SMTPException as e:
+            result = 'Fail to send mail. Error: %s' % (e)
+
+        return result
 
     def send_mail(self, subject, message, from_email, recipient_list, cc=None, attachments=None,
                   fail_silently=False, connection=None, html_message=None):
