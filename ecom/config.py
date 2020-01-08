@@ -40,12 +40,6 @@ MYSQL_product_table = {
     'ECN_model': 'ECN_model',
     'DataCenter' : 'DataCenter',
     'DC_upload' : 'DC_upload',
-<<<<<<< HEAD
-    'PVTGoods' : 'PVTGoods',
-    'PVTGoods_upload' : 'PVTGoods_upload',
-    'PVTComp' : 'PVTComp',
-    'PVTComp_upload' : 'PVTComp_upload'
-=======
     'FACheck' : 'FACheck',
     'FACheck_upload' : 'FACheck_upload',
     'FAInfo_upload' : 'FAInfo_upload',
@@ -57,7 +51,6 @@ MYSQL_product_table = {
     'PVTComp_upload' : 'PVTComp_upload',
     'PVTGoods' : 'PVTGoods',
     'PVTGoods_upload' : 'PVTGoods_upload',
->>>>>>> master
 }
 
 AGILE_product_table = {
