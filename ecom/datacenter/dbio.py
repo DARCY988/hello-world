@@ -138,11 +138,11 @@ class DataCenterMySQLIO(MySQL):
         return result
 
     def insert_datacenter(self, sql_dict):                                # 考慮將路徑改為timestamp or UUID
-        create_time = datetime.datetime.now()                                                       # 取得上傳時間
-        exp_date = datetime.datetime.strptime(str(sql_dict['exp_date']), '%Y-%m-%d %H:%M:%S')       # 格式化時間
-        issue_date = datetime.datetime.strptime(str(sql_dict['issue_date']), '%Y-%m-%d %H:%M:%S')   # 格式化時間
-        cert_no = str(sql_dict['cert_no']).replace(" ", "")                                     # 格式化證書號碼 刪除空白
-        if sql_dict['status'] == 'Suspended':                                               # 將狀態改為int格式寫入數據庫
+        create_time = datetime.datetime.now()                            # 取得上傳時間
+        exp_date = datetime.datetime.strptime(str(sql_dict['exp_date']), '%Y-%m-%d %H:%M:%S') #格式化時間
+        issue_date = datetime.datetime.strptime(str(sql_dict['issue_date']), '%Y-%m-%d %H:%M:%S') #格式化時間
+        cert_no = str(sql_dict['cert_no']).replace(" ", "") #格式化證書號碼 刪除空白
+        if sql_dict['status'] == 'Suspended':   # 將狀態改為int格式寫入數據庫
             status = 0
         else:
             status = 1
