@@ -117,16 +117,16 @@ AGILE_login_info = {
 # }
 
 
-#  leolee loacl MySQL login accout and password
-MYSQL_login_info = {
-    'username': 'root',
-    'password': '55665566',
-    'hostname': '127.0.0.1',
-    'port': 3306,
-    'db_name': 'test',
-    'prod_table': MYSQL_product_table,
-    'test_table': MYSQL_test_table
-}
+# #  leolee loacl MySQL login accout and password
+# MYSQL_login_info = {
+#     'username': 'root',
+#     'password': '55665566',
+#     'hostname': '127.0.0.1',
+#     'port': 3306,
+#     'db_name': 'test',
+#     'prod_table': MYSQL_product_table,
+#     'test_table': MYSQL_test_table
+# }
 
 
 # -------------------- #
