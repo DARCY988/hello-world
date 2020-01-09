@@ -191,7 +191,7 @@ def list_files(request, dbio, module):
         value = dbio.get_seq('FACheck', site=site, category=category,
                              sample_category=s_category, sample_pid=s_pid).iloc[0]['seq']
 
-    data = dbio.get_files(table, key, value)
+    data = dbio.read_upload(table, key, value)
 
     result = []
     for row in range(0, len(data.index)):
