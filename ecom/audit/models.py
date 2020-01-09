@@ -200,8 +200,8 @@ def list_files(request, dbio, module):
                 'name': data.iloc[row][1],
                 'path': data.iloc[row][2],
                 'type': data.iloc[row][3],
-                'upload_time': str(data.iloc[row][4]),
                 'uploader': data.iloc[row][5],
+                'upload_time': str(data.iloc[row][4]),
             }
         )
 
