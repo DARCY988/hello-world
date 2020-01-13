@@ -119,6 +119,14 @@ def report_view(request, debug, api_version):
             'message': 'Update report successfully.'
         }
 
+    # # Delete report
+    # if request.method == 'DELETE':
+    #     site = request.POST.get('site')
+    #     category = request.POST.get('category')
+
+    #     db.delete_report(site, category)
+    #     db.delete_file()
+
     return Response(result)
 
 
@@ -164,6 +172,7 @@ def check_view(request, debug, api_version):
             'message': 'Create check successfully.'
         }
 
+    # Edit check
     if request.method == 'PUT':
         # Keys
         site = request.POST.get('site')

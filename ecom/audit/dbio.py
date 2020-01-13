@@ -156,3 +156,11 @@ class ECNMySQLIO(MySQL):
             {'table': self.db_tables[table], 'name': name, 'path': path}
         )
         return self.manipulate_db(sql)
+
+    def delete_report(self, site, category):
+        sql = '''
+        DELETE FROM `%(table)s` WHERE site="%(site)s" and category="%(category)s"
+        ''' % (
+            {'table': self.db_tables['FAReport'], 'site': site, 'category': category}
+        )
+        return self.manipulate_db(sql)

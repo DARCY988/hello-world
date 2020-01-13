@@ -221,3 +221,9 @@ def delete_files(dbio, module, name, path):
     result = fileio.delete(path, name)
 
     return result
+
+# def delete_report_table(dbio, site, category):
+#     # Delete db record
+#     seq = dbio.get_seq('FAReport', site=site, category=category)
+#     dbio.delete_report(site, category)
+#     dbio.delete_file('FAReport_upload', )
