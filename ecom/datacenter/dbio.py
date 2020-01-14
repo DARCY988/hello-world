@@ -13,16 +13,16 @@ class DataCenterMySQLIO(MySQL):
     def get_all_data(self, **kwargs):
         #  將kwargs 寫入變數
         try:
-            select_site = ' WHERE ' + 'site' + ' = ' + '\'' + kwargs['select_site'] + '\''
+            select_site = " WHERE site = '" + kwargs['select_site'] + '\''
         except Exception:
             select_site = ''
         try:
-            select_category = ' WHERE ' + 'category' + ' = ' + '\'' + kwargs['select_category'] + '\''
+            select_category = " WHERE category = '" + kwargs['select_category'] + '\''
         except Exception:
             select_category = ''
 
         if select_site and select_category :
-            select_category = ' AND ' + 'category' + ' = ' + '\'' + kwargs['select_category'] + '\''
+            select_category = " AND category = '" + kwargs['select_category'] + '\''
 
         get_column = 'site, category, cert_no, applicant, pid, issue_date, exp_date, status, upload, update_time'
         #  get_column 要顯示的欄位
@@ -45,15 +45,15 @@ class DataCenterMySQLIO(MySQL):
         #  EX column = category ,  value = CCC
         #  應該可以改寫迴圈
         try:
-            status_value = ' AND ' + 'status' + ' = ' + '\'' + kwargs['status_value'] + '\''
+            status_value = " AND status = '" + kwargs['status_value'] + '\''
         except Exception:
             status_value = ''
         try:
-            select_site = ' AND ' + 'site' + ' = ' + '\'' + kwargs['select_site'] + '\''
+            select_site = " AND site = '" + kwargs['select_site'] + '\''
         except Exception:
             select_site = ''
         try:
-            select_category = ' AND ' + 'category' + ' = ' + '\'' + kwargs['select_category'] + '\''
+            select_category = " AND category = '" + kwargs['select_category'] + '\''
         except Exception:
             select_category = ''
         #  改寫為迴圈

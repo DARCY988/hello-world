@@ -4,10 +4,15 @@
 
 
 from fii_ai_api.utils.utility import log, fii_cronlog_handler
+from fii_ai_api.utils.files import FileHandler
+from ecom.pvt import models
+from fii_ai_api.utils.mail import BasicMail
+from fii_ai_api.settings import BASE_DIR
+import os
 
-CRON_JOBS = [
-    # ('*/1 * * * *', 'demo.cron.my_cron_job_demo', '>> /srv/logs/demo_cron_job.log'),
-]
+path = '>> ' + os.path.join(BASE_DIR, 'fii_ai_api', '.logs', 'ecom.log')
+CRON_JOBS = [('0 9 * * *', 'ecom.cron.pvt_alarm', path)
+             ]
 
 
 # Define your corn jobs function here.
@@ -40,3 +45,18 @@ def my_cron_job_demo():
     results = "Algorithm results"
     log('Use `log` in cron job as built-in `print` to record your custom messages.')
     return results
+
+
+@fii_cronlog_handler
+def pvt_alarm():
+
+    pvtgoods_alarm_msg = str(models.alarm_list(page='goods'))  # 取得PVT需要警示的資料
+    pvtcomp_alarm_msg = str(models.alarm_list(page='comp'))    # 取得PVT需要警示的資料
+    pvt_alarm_mail = BasicMail()                                    # 實例化mail物件
+    result = pvt_alarm_mail.send_fii_mail('pvt_alarm', pvtcomp_alarm_msg, 'IAI', ['leo.mm.li@mail.foxconn.com'])
+    #  寄發mail
+    print(pvtgoods_alarm_msg)  # 將取得pvt goods警示資料結果記錄在log
+    print(pvtcomp_alarm_msg)   # 將取得pvt comp警示資料結果記錄在log
+    print(result)              # 將寄發mail結果記錄在log
+
+    return 'PVT mail alarm function'

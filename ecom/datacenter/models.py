@@ -1,5 +1,6 @@
 from .dbio import DataCenterMySQLIO
 import datetime
+from ecom.config import __CATEGORIES__, __LOCATIONS__
 # Define your DataBase IO Module
 db = DataCenterMySQLIO(debug=True)
 
@@ -38,7 +39,7 @@ def checking_expire(**kwargs):  # EX: category = ccc or site = FOC
 def checking_status_by_category(column, **kwargs):
     #  EX: column = category , EX: column = site , kwargs {category:CCC, site:FOC}
     result = {}
-    category_list = ['CCC', 'ETL', 'ETC', 'XXX']
+    category_list = __CATEGORIES__
 
     for category_value in category_list:
         status = 1  # 預設證書狀態為1:有效
@@ -54,17 +55,10 @@ def checking_status_by_category(column, **kwargs):
 
 
 def checking_status_by_site(column, **kwargs):  # EX: column = site , kwargs {category:CCC, site:FOC}
-
     result = []
-    site_list = ['FCZ', 'FTX', 'FJZ', 'FOC', 'FOL']
-    coord = {
-        "FCZ": [15.2120232, 49.9493036],
-        "FTX": [-94.0602476, 44.8204983],
-        "FJZ": [-106.543702, 31.6859596],
-        "FOC": [115.0491412, 27.7198832],
-        "FOL": [113.899891, 18.6764474]}
+    coord = __LOCATIONS__
 
-    for site_value in site_list:
+    for site_value in coord.keys():
         status = 1  # 預設證書狀態為1:有效
         site_count = db.get_count(column, site_value, **kwargs)  # 取得證書數量
         count = site_count[0][0]  # 回傳值是list 指定[0][0]取出數字
