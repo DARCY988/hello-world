@@ -62,6 +62,10 @@ urlpatterns = [
                             re_path(r'(?P<page>\w+)/select_category/', pvt_views.api_checking_status_by_category),
                             re_path(r'(?P<page>\w+)/select_site/', pvt_views.api_checking_status_by_site),
                             re_path(r'(?P<page>\w+)/get_all_data/', pvt_views.api_get_all_data),
+                            re_path(r'(?P<page>\w+)/upload/', pvt_views.pvt_goods_upload),
+                            re_path(r'(?P<page>\w+)/delete/', pvt_views.delete_by_path),
+                            re_path(r'preview/', pvt_views.preview_by_path),
+                            re_path(r'download/', pvt_views.download_by_path),
                         ]
                     )
                 )
