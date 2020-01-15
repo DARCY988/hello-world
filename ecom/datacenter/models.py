@@ -69,3 +69,35 @@ def checking_status_by_site(column, **kwargs):  # EX: column = site , kwargs {ca
         result.append({'name' : site_value , 'coord' : coord[site_value], 'status' : status, 'value' : count})
         #  將結果寫入
     return result
+
+
+def alarm_list(**kwargs):  # EX: category = ccc or site = FOC
+
+    time_now = datetime.datetime.now()   # 取得現在時間
+    result = []
+    data = db.get_all_data(**kwargs)     # 取得數據庫所有資料
+    for row in data:                     # 取出每一筆證書
+        diff_day = row['exp_date'] - time_now  # 到期時間減去現在時間
+        if diff_day.days >= 120:               # >120天為正常 狀態0
+            status = 0
+        if diff_day.days < 120:              # <120 要預警 呈現橘色 狀態1
+            status = 1
+        if diff_day.days < 30:               # <30 每天預警 呈現紅色 狀態2
+            status = 2
+
+        # 將取出的資料與日期比對結果寫入result
+        # status取出是bytes, 要轉ord
+        if status != 0:
+            result.append({'site' : row['site'],
+                           'category' : row['category'],
+                           'certificate' : row['cert_no'],
+                           'pid': row['pid'],
+                           'applicant' : row['applicant'],
+                           'issue_date' : row['issue_date'],
+                           'exp_date' : row['exp_date'],
+                           'status' : ord(row['status']),
+                           'upload' : row['upload'],
+                           'update_time' : row['update_time'],
+                           'exp_date_status' : status
+                           })
+    return result
