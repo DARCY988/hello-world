@@ -18,6 +18,12 @@ def checking_expire(**kwargs):  # EX: category = ccc or site = FOC
             status = 1
         if diff_day.days < 30:               # <30 每天預警 呈現紅色 狀態2
             status = 2
+
+        # date格式化為只有日期，沒有時分秒
+        row['pvt_date'] = row['pvt_date'].strftime("%Y/%m/%d")
+        row['nexttime'] = row['nexttime'].strftime("%Y/%m/%d")
+        row['create_time'] = row['create_time'].strftime("%Y/%m/%d")
+        row['update_time'] = row['update_time'].strftime("%Y/%m/%d")
         # 將取出的資料與日期比對結果寫入result，不同分頁回傳不同欄位
         # status取出是bytes, 要轉ord
         if kwargs['page'] == 'goods':

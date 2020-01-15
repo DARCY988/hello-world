@@ -21,6 +21,11 @@ def checking_expire(**kwargs):  # EX: category = ccc or site = FOC
 
         # 將取出的資料與日期比對結果寫入result
         # status取出是bytes, 要轉ord
+        # issue_date格式化為只有日期，沒有時分秒
+        row['issue_date'] = row['issue_date'].strftime("%Y/%m/%d")
+        # exp_date格式化為只有日期，沒有時分秒
+        row['exp_date'] = row['exp_date'].strftime("%Y/%m/%d")
+        # 將每個row插入result list
         result.append({'site' : row['site'],
                        'category' : row['category'],
                        'certificate' : row['cert_no'],
