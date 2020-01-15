@@ -52,31 +52,33 @@ def api_get_all_data(request, debug, api_version,  # these three parameters alwa
 
 
 @fii_api_handler(['post'])
-def dc_upload(request, debug, api_version  # these three parameters always place at index 0:2
-              ):  # Add your parameters here
+def pvt_goods_upload(request, debug, api_version,  # these three parameters always place at index 0:2
+                     page):  # Add your parameters here
+    # 需回傳該檔案在pvt_goods table的流水號參數(key)，才能上傳該檔案
 
-    result = db.insert_dc_upload(path=BASE_DIR, file=request.FILES['file'],
-                                 name=request.FILES['file'].name,
-                                 cert_no=request.POST.get('cert_no'),
-                                 upload=request.POST.get('upload'),
-                                 upload_type=request.POST.get('upload_type'))
+    result = db.pvt_upload(page=page,
+                           path=BASE_DIR,
+                           file=request.FILES['file'],
+                           seq=request.POST.get('seq'),
+                           name=request.FILES['file'].name,
+                           upload=request.POST.get('upload'))
 
     return result
 
 
+# @fii_api_handler(['post'])
+# def get_path_by_cert(request, debug, api_version  # these three parameters always place at index 0:2
+#                      ):  # Add your parameters here
+
+#     result = db.select_cert_files(request.POST.get('cert_no'))
+#     return result
+
+
 @fii_api_handler(['post'])
-def get_path_by_cert(request, debug, api_version  # these three parameters always place at index 0:2
-                     ):  # Add your parameters here
+def delete_by_path(request, debug, api_version,  # these three parameters always place at index 0:2
+                   page):  # Add your parameters here
 
-    result = db.select_cert_files(request.POST.get('cert_no'))
-    return result
-
-
-@fii_api_handler(['post'])
-def delete_by_path(request, debug, api_version  # these three parameters always place at index 0:2
-                   ):  # Add your parameters here
-
-    result = db.delete_cert_files(path=request.POST.get('path'))
+    result = db.delete_files(page=page, path=request.POST.get('path'))
 
     return result
 
@@ -98,34 +100,34 @@ def download_by_path(request, debug, api_version  # these three parameters alway
     return result
 
 
-@fii_api_handler(['post'])
-def upload_excel(request, debug, api_version  # these three parameters always place at index 0:2
-                 ):  # Add your parameters here
+# @fii_api_handler(['post'])
+# def upload_excel(request, debug, api_version  # these three parameters always place at index 0:2
+#                  ):  # Add your parameters here
 
-    data = request.FILES['file']
-    datacente_df = pd.read_excel(data, sheet_name='Data Center')
-    result_list = []
-    for i in range(len(datacente_df)):
-        sql_dict = {}
-        sql_dict['site'] = datacente_df.iloc[i][0]
-        sql_dict['category'] = datacente_df.iloc[i][1]
-        sql_dict['cert_no'] = datacente_df.iloc[i][2]
-        sql_dict['applicant'] = datacente_df.iloc[i][3]
-        sql_dict['pid'] = datacente_df.iloc[i][4]
-        sql_dict['issue_date'] = datacente_df.iloc[i][5]
-        sql_dict['exp_date'] = datacente_df.iloc[i][6]
-        sql_dict['status'] = datacente_df.iloc[i][7]
-        sql_dict['upload'] = 'null'
-        sql_dict['create_time'] = datetime.datetime.now()
-        try:
-            result = db.insert_datacenter(sql_dict)
-            if result:
-                result = 'upload row %d success' % i
-            else:
-                result = 'upload row %d fail, Duplicate entry pid' % i
-            result_list.append(result)
-        except Exception:
-            result = 'upload row %i error' % i
-            result_list.append(result)
+#     data = request.FILES['file']
+#     datacente_df = pd.read_excel(data, sheet_name='Data Center')
+#     result_list = []
+#     for i in range(len(datacente_df)):
+#         sql_dict = {}
+#         sql_dict['site'] = datacente_df.iloc[i][0]
+#         sql_dict['category'] = datacente_df.iloc[i][1]
+#         sql_dict['cert_no'] = datacente_df.iloc[i][2]
+#         sql_dict['applicant'] = datacente_df.iloc[i][3]
+#         sql_dict['pid'] = datacente_df.iloc[i][4]
+#         sql_dict['issue_date'] = datacente_df.iloc[i][5]
+#         sql_dict['exp_date'] = datacente_df.iloc[i][6]
+#         sql_dict['status'] = datacente_df.iloc[i][7]
+#         sql_dict['upload'] = 'null'
+#         sql_dict['create_time'] = datetime.datetime.now()
+#         try:
+#             result = db.insert_datacenter(sql_dict)
+#             if result:
+#                 result = 'upload row %d success' % i
+#             else:
+#                 result = 'upload row %d fail, Duplicate entry pid' % i
+#             result_list.append(result)
+#         except Exception:
+#             result = 'upload row %i error' % i
+#             result_list.append(result)
 
-    return result_list
+#     return result_list

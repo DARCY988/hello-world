@@ -1,5 +1,6 @@
 from .dbio import DataCenterMySQLIO
 import datetime
+from ecom.config import __CATEGORIES__, __LOCATIONS__
 # Define your DataBase IO Module
 db = DataCenterMySQLIO(debug=True)
 
@@ -38,7 +39,7 @@ def checking_expire(**kwargs):  # EX: category = ccc or site = FOC
 def checking_status_by_category(column, **kwargs):
     #  EX: column = category , EX: column = site , kwargs {category:CCC, site:FOC}
     result = {}
-    category_list = ['CCC', 'ETL', 'ETC', 'XXX']
+    category_list = __CATEGORIES__
 
     for category_value in category_list:
         status = 1  # 預設證書狀態為1:有效
@@ -54,17 +55,10 @@ def checking_status_by_category(column, **kwargs):
 
 
 def checking_status_by_site(column, **kwargs):  # EX: column = site , kwargs {category:CCC, site:FOC}
-
     result = []
-    site_list = ['FCZ', 'FTX', 'FJZ', 'FOC', 'FOL']
-    coord = {
-        "FCZ": [15.2120232, 49.9493036],
-        "FTX": [-94.0602476, 44.8204983],
-        "FJZ": [-106.543702, 31.6859596],
-        "FOC": [115.0491412, 27.7198832],
-        "FOL": [113.899891, 18.6764474]}
+    coord = __LOCATIONS__
 
-    for site_value in site_list:
+    for site_value in coord.keys():
         status = 1  # 預設證書狀態為1:有效
         site_count = db.get_count(column, site_value, **kwargs)  # 取得證書數量
         count = site_count[0][0]  # 回傳值是list 指定[0][0]取出數字
@@ -74,4 +68,36 @@ def checking_status_by_site(column, **kwargs):  # EX: column = site , kwargs {ca
             status = 0
         result.append({'name' : site_value , 'coord' : coord[site_value], 'status' : status, 'value' : count})
         #  將結果寫入
+    return result
+
+
+def alarm_list(**kwargs):  # EX: category = ccc or site = FOC
+
+    time_now = datetime.datetime.now()   # 取得現在時間
+    result = []
+    data = db.get_all_data(**kwargs)     # 取得數據庫所有資料
+    for row in data:                     # 取出每一筆證書
+        diff_day = row['exp_date'] - time_now  # 到期時間減去現在時間
+        if diff_day.days >= 120:               # >120天為正常 狀態0
+            status = 0
+        if diff_day.days < 120:              # <120 要預警 呈現橘色 狀態1
+            status = 1
+        if diff_day.days < 30:               # <30 每天預警 呈現紅色 狀態2
+            status = 2
+
+        # 將取出的資料與日期比對結果寫入result
+        # status取出是bytes, 要轉ord
+        if status != 0:
+            result.append({'site' : row['site'],
+                           'category' : row['category'],
+                           'certificate' : row['cert_no'],
+                           'pid': row['pid'],
+                           'applicant' : row['applicant'],
+                           'issue_date' : row['issue_date'],
+                           'exp_date' : row['exp_date'],
+                           'status' : ord(row['status']),
+                           'upload' : row['upload'],
+                           'update_time' : row['update_time'],
+                           'exp_date_status' : status
+                           })
     return result
