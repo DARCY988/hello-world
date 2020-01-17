@@ -40,8 +40,7 @@ def info_view(request, debug, api_version):  # Create method is include in uploa
 
     # List all report
     if request.method == 'GET':
-        site = request.GET.get('site', None)
-        result = db.read_info(site)
+        result = list_files(request, db, 'info')
 
     if request.method == 'DELETE':
         result = {}
@@ -56,9 +55,9 @@ def report_view(request, debug, api_version):
 
     # List all report
     if request.method == 'GET':
-        site = request.GET.get('site', None)
-        category = request.GET.get('category', None)
-        result = db.read_report(site, category)
+        site = request.POST.get('site')
+        category = request.POST.get('category')
+        result = db.read_report(site=site, category=category)
 
     # Add new record
     if request.method == 'POST':
@@ -120,6 +119,14 @@ def report_view(request, debug, api_version):
             'message': 'Update report successfully.'
         }
 
+    # # Delete report
+    # if request.method == 'DELETE':
+    #     site = request.POST.get('site')
+    #     category = request.POST.get('category')
+
+    #     db.delete_report(site, category)
+    #     db.delete_file()
+
     return Response(result)
 
 
@@ -134,11 +141,11 @@ def check_view(request, debug, api_version):
 
     # List all report
     if request.method == 'GET':
-        site = request.GET.get('site', None)
-        category = request.GET.get('category', None)
-        sample_category = request.GET.get('sample_category', None)
-        sample_pid = request.GET.get('sample_pid', None)
-        result = db.read_check(site, category, sample_category, sample_pid)
+        site = request.POST.get('site')
+        category = request.POST.get('category')
+        sample_category = request.POST.get('sample_category')
+        sample_pid = request.POST.get('sample_pid')
+        result = db.read_check(site=site, category=category, sample_category=sample_category, sample_pid=sample_pid)
 
     # Add new record
     if request.method == 'POST':
@@ -165,6 +172,7 @@ def check_view(request, debug, api_version):
             'message': 'Create check successfully.'
         }
 
+    # Edit check
     if request.method == 'PUT':
         # Keys
         site = request.POST.get('site')

@@ -12,16 +12,7 @@ class ECNMySQLIO(MySQL):
         SELECT seq FROM `%(table)s` WHERE %(conditions)s
         ''' % (
             {'table': self.db_tables[table],
-             'conditions': ' and '.join('%s="%s"' % (k, v) for (k, v) in kwargs.items())}
-        )
-        return self.manipulate_db(sql, dtype='DataFrame')
-
-    def get_files(self, table, key, value):
-        sql = '''
-        SELECT %(key)s, name, path, type, upload_time, upload FROM `%(table)s`
-        WHERE %(key)s="%(value)s"
-        ''' % (
-            {'table': self.db_tables[table], 'key': key, 'value': value}
+             'conditions': ' and '.join('%s="%s"' % (k, v) for (k, v) in kwargs.items() if v)}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
@@ -80,17 +71,18 @@ class ECNMySQLIO(MySQL):
         )
         return self.manipulate_db(sql)
 
-    def read_info(self, site=None):
+    def read_upload(self, table, key, value):
         sql = '''
-        SELECT site, name, path, type, upload, upload_time
+        SELECT %(key)s, name, path, type, upload, upload_time
         FROM `%(table)s`
         %(condition)s
         ''' % (
-            {'table': self.db_tables['FAInfo_upload'], 'condition': 'WHERE site="%s"' % site if site else ''}
+            {'table': self.db_tables[table], 'key': key,
+             'condition': 'WHERE %s="%s"' % (key, value) if (key and value) else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
-    def read_report(self, site=None, category=None):
+    def read_report(self, **kwargs):
         sql = '''
         SELECT site, category, class, audit_date, audit_result, nextaudittime, upload, create_time, update_time
         FROM `%(table)s`
@@ -98,14 +90,14 @@ class ECNMySQLIO(MySQL):
         ''' % (
             {
                 'table': self.db_tables['FAReport'],
-                'condition': 'WHERE %(site)s %(category)s' % ({
-                    'site': 'site="%s"' % site if site else '',
-                    'category': 'and category="%s"' % category if category else ''}) if (site or category) else ''
+                'condition': 'WHERE %s' % (
+                    ' and '.join('%s="%s"' % (k, v) for (k, v) in kwargs.items() if v)) if kwargs else ''
             }
         )
+        print(sql)
         return self.manipulate_db(sql, dtype='DataFrame')
 
-    def read_check(self, site=None, category=None, sample_category=None, sample_pid=None):
+    def read_check(self, **kwargs):
         sql = '''
         SELECT site, category, audit_date, sample_category, sample_pid, sample_applicant, sample_conform,
         upload, create_time, update_time
@@ -113,12 +105,8 @@ class ECNMySQLIO(MySQL):
         %(condition)s
         ''' % (
             {'table': self.db_tables['FACheck'],
-             'condition': 'WHERE %(site)s %(category)s %(sample_category)s %(sample_pid)s' % (
-                 {'site': 'site="%s"' % site if site else '',
-                  'category': 'and category="%s"' % category if category else '',
-                  'sample_category': 'and sample_category="%s"' % sample_category if sample_category else '',
-                  'sample_pid': 'and sample_pid="%s"' % sample_pid if sample_pid else ''})
-                if (site or category or sample_category or sample_pid) else ''}
+             'condition': 'WHERE %s' % (
+                ' and '.join('%s="%s"' % (k, v) for (k, v) in kwargs.items() if v)) if kwargs else ''}
         )
         return self.manipulate_db(sql, dtype='DataFrame')
 
@@ -166,5 +154,13 @@ class ECNMySQLIO(MySQL):
         DELETE FROM `%(table)s` WHERE name="%(name)s" and path="%(path)s"
         ''' % (
             {'table': self.db_tables[table], 'name': name, 'path': path}
+        )
+        return self.manipulate_db(sql)
+
+    def delete_report(self, site, category):
+        sql = '''
+        DELETE FROM `%(table)s` WHERE site="%(site)s" and category="%(category)s"
+        ''' % (
+            {'table': self.db_tables['FAReport'], 'site': site, 'category': category}
         )
         return self.manipulate_db(sql)
