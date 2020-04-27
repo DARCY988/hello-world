@@ -173,3 +173,4 @@ Done! you can test on your api like `localhost:8000/<your app name>/<urlpattern>
 
 ## remove all jobs
 > python3 manage.py crontab remove
+# hello-world
