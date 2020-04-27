@@ -90,15 +90,30 @@ WSGI_APPLICATION = 'fii_ai_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 DATABASES = {
-    'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': os.path.join(BASE_DIR, 'db.sqlite3')},
-    'fii-ai': {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'test_db', #here is import
+#         'USER': 'root',
+#         'PASSWORD': '123456',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+# },
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '10.124.131.87',
-        'PORT': 8871,
+        'NAME': 'HR_data', #here is import
         'USER': 'api',
         'PASSWORD': 'Develop123!@#',
-        'NAME': 'init',
-    }
+        'HOST': '10.132.53.202',
+        'PORT': '8871',
+},
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'HOST': '10.132.53.202',
+    #     'PORT': '8871',
+    #     'USER': 'api',
+    #     'PASSWORD': 'Develop123!@#',
+    #     'NAME': 'HR_data',
+    # }
 }
 
 

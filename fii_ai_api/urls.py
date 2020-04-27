@@ -51,13 +51,14 @@ Examples:
     so we can serve the same functionality to two different audiences (authors and publishers).
 """
 from django.contrib import admin
-from django.urls import include, re_path
+from django.urls import include, re_path,path
 from django.conf import settings
 from django.conf.urls.static import static
 
 app_name = 'fii_ai_api'
 
 urlpatterns = [
+    path('', include('demo.urls')),
     re_path('admin/', admin.site.urls),
     re_path(
         r'^(?P<debug>test/)*(?P<api_version>(latest|v\w+\.\w+(\.\w*)*))/',
@@ -69,5 +70,6 @@ urlpatterns = [
                 # Example. re_path(r'^<app name>/', include('<app name>.urls', namespace='<app name>')),
             ]
         ),
+    
     ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

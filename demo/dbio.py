@@ -11,8 +11,8 @@ class DemoMySQLIO(MySQL):
 
         sql = '''
         SELECT * FROM `%(demo)s`
-        %(select_id)s
+        
         ''' % (
-            {'demo': self.db_tables['demo'], 'select_id': 'WHERE id = %s' % v if v else ''}
+            {'demo': self.db_tables['to_csv2']}
         )
         return self.manipulate_db(sql, dtype='DataFrame')

@@ -13,30 +13,32 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import include, re_path
+from django.urls import include, re_path,path
 from . import views
 
 app_name = 'demo'
 
 urlpatterns = [
-    re_path(
-        r'^view/',  # [AT/SD Team]TODO: Add your view api for fornt-end engineer.
-        include(
-            [
-                re_path(r'print/(?P<value>\w+)*', views.demo_ai_view),
-                # Add your api path here,
-                # Example. re_path(r'^<custom url path>/', views.<function>),
-            ]
-        ),
-    ),
-    re_path(
-        r'^api/',  # [DE/SD Team]TODO: Add api for new AT Team members to use.
-        include(
-            [
-                re_path(r'print/(?P<value>\w+)*', views.api_demo_read),
-                # Add your api path here,
-                # Example. re_path(r'^<custom url path>/', views.<function>),
-            ]
-        ),
-    ),
+    path('small_chart', views.small_chart , name = 'home'),
+    path('big_chart', views.big_chart , name = 'home'),
+    # re_path(
+    #     r'^view/',  # [AT/SD Team]TODO: Add your view api for fornt-end engineer.
+    #     include(
+    #         [
+    #             re_path(r'print/(?P<value>\w+)*', views.demo_ai_view),
+    #             # Add your api path here,
+    #             # Example. re_path(r'^<custom url path>/', views.<function>),
+    #         ]
+    #     ),
+    # ),
+    # re_path(
+    #     r'^api/',  # [DE/SD Team]TODO: Add api for new AT Team members to use.
+    #     include(
+    #         [
+    #             re_path(r'print/(?P<value>\w+)*', views.api_demo_read),
+    #             # Add your api path here,
+    #             # Example. re_path(r'^<custom url path>/', views.<function>),
+    #         ]
+    #     ),
+    # ),
 ]
