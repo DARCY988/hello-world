@@ -5,6 +5,7 @@ __CONTRIBUTORS__ = ['Bean']
 __API_VERSION__ = ['latest', 'v1.0']
 
 # test adding one line
+# test adding second line
 # -------------------- #
 # DB Information
 # -------------------- #
